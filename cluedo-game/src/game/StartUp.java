@@ -24,7 +24,6 @@ public class StartUp {
 
 		int noPlayers = 0;
 		boolean humanParticipation = false;
-		boolean printAll = false;
 
 		// No. players
 		System.out.println( "Please enter the number of players (3-6) [3]:" );
@@ -62,29 +61,6 @@ public class StartUp {
 					break;
 				} else if ( input.equalsIgnoreCase( "n" ) ) {
 					humanParticipation = false;
-					break;
-				}
-				System.out.println( "Must be 'y' or 'n'." );
-			} catch ( IOException e ) {
-				System.out.println( "Must be 'y' or 'n'." );
-			}
-		}
-
-		// Debug
-		System.out.println( "Print all debug information ? (y/n) [n]" );
-		while ( true ) {
-			try {
-				String input = in.readLine();
-				if ( input.isEmpty() ) {
-					// Default
-					printAll = false;
-					break;
-				}
-				if ( input.equalsIgnoreCase( "y" ) ) {
-					printAll = true;
-					break;
-				} else if ( input.equalsIgnoreCase( "n" ) ) {
-					printAll = false;
 					break;
 				}
 				System.out.println( "Must be 'y' or 'n'." );
