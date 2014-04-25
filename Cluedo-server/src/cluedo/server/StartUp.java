@@ -1,11 +1,13 @@
 package cluedo.server;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import cluedo.server.definition.DefinitionManager;
 import crossnet.log.Log;
+import crossnet.log.LogLevel;
 
 /**
  * The entry point for the Cluedo-server.
@@ -17,7 +19,9 @@ import crossnet.log.Log;
  */
 public class StartUp {
 
-	public static void main( String[] args ) {
+	public static void main( String[] args ) throws IOException {
+		Log.set( LogLevel.TRACE );
+
 		int port = 0;
 		int noPlayers = 0;
 		Path definitionPath = null;
@@ -84,6 +88,8 @@ public class StartUp {
 			Log.info( "Cluedo-server", "Using definition '" + DefinitionManager.pathToDefinitionName( definitionPath ) + "' at: " + definitionPath );
 		}
 
+		// Start server
 		CluedoServer cluedoServer = new CluedoServer( port, noPlayers, definitionPath );
+		cluedoServer.loop();
 	}
 }
