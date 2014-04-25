@@ -1,0 +1,50 @@
+C1:Miss Scarlet
+C2:Colonel Mustard
+C3:Mrs. White
+C4:Mr. Green
+C5:Mrs. Peacock
+C6:Professor Plum
+R1:Kitchen
+R2:Ballroom
+R3:Conservatory
+R4:Dining Room
+R5:Billiard Room
+R6:Library
+R7:Lounge
+R8:Hall
+R9:Study
+W1:Candlestick
+W2:Knife
+W3:Lead Pipe
+W4:Revolver
+W5:Rope
+W6:Wrench
+S1:R1-R9
+S2:R3-R7
+BOARD
+#	#	#	#	#	#	#	#	#	C3	#	#	#	#	C4	#	#	#	#	#	#	#	#	#
+R1	R1	R1	R1	R1	R1	#	*	*	*	R2	R2	R2	R2	*	*	*	#	R3	R3	R3	R3	R3	R3
+R1	R1	R1	R1	R1	R1	*	*	R2	R2	R2	R2	R2	R2	R2	R2	*	*	R3	R3	R3	R3	R3	R3
+R1	R1	R1	R1	R1	R1	*	*	R2	R2	R2	R2	R2	R2	R2	R2	*	*	R3	R3	R3	R3	R3	R3
+R1	R1	R1	R1	R1	R1	*	*	R2	R2	R2	R2	R2	R2	R2	R2	*	*	R3	R3	R3	R3	R3	R3
+R1	R1	R1	R1	R1	R1	*	e	E2	R2	R2	R2	R2	R2	R2	E2	e	*	e	E3	R3	R3	R3	#
+#	R1	R1	R1	E1	R1	*	*	R2	R2	R2	R2	R2	R2	R2	R2	*	*	*	*	*	*	*	C5
+*	*	*	*	e	*	*	*	R2	E2	R2	R2	R2	R2	E2	R2	*	*	*	*	*	*	*	#
+#	*	*	*	*	*	*	*	*	e	*	*	*	*	e	*	*	*	R5	R5	R5	R5	R5	R5
+R4	R4	R4	R4	R4	*	*	*	*	*	*	*	*	*	*	*	*	e	E5	R5	R5	R5	R5	R5
+R4	R4	R4	R4	R4	R4	R4	R4	*	*	#	#	#	#	#	*	*	*	R5	R5	R5	R5	R5	R5
+R4	R4	R4	R4	R4	R4	R4	R4	*	*	#	#	#	#	#	*	*	*	R5	R5	R5	R5	R5	R5
+R4	R4	R4	R4	R4	R4	R4	E4	e	*	#	#	#	#	#	*	*	*	R5	R5	R5	R5	E5	R5
+R4	R4	R4	R4	R4	R4	R4	R4	*	*	#	#	#	#	#	*	*	*	*	*	e	*	e	#
+R4	R4	R4	R4	R4	R4	R4	R4	*	*	#	#	#	#	#	*	*	*	R6	R6	E6	R6	R6	#
+R4	R4	R4	R4	R4	R4	E4	R4	*	*	#	#	#	#	#	*	*	R6	R6	R6	R6	R6	R6	R6
+#	*	*	*	*	*	e	*	*	*	#	#	#	#	#	*	e	E6	R6	R6	R6	R6	R6	R6
+C2	*	*	*	*	*	*	*	*	*	*	e	e	*	*	*	*	R6	R6	R6	R6	R6	R6	R6
+#	*	*	*	*	*	e	*	*	R8	R8	E8	E8	R8	R8	*	*	*	R6	R6	R6	R6	R6	#
+R7	R7	R7	R7	R7	R7	E7	*	*	R8	R8	R8	R8	R8	R8	*	*	*	*	*	*	*	*	C6
+R7	R7	R7	R7	R7	R7	R7	*	*	R8	R8	R8	R8	R8	E8	e	*	e	*	*	*	*	*	#
+R7	R7	R7	R7	R7	R7	R7	*	*	R8	R8	R8	R8	R8	R8	*	*	E9	R9	R9	R9	R9	R9	R9
+R7	R7	R7	R7	R7	R7	R7	*	*	R8	R8	R8	R8	R8	R8	*	*	R9	R9	R9	R9	R9	R9	R9
+R7	R7	R7	R7	R7	R7	R7	*	*	R8	R8	R8	R8	R8	R8	*	*	R9	R9	R9	R9	R9	R9	R9
+R7	R7	R7	R7	R7	R7	#	C1	#	R8	R8	R8	R8	R8	R8	#	*	# 	R9	R9	R9	R9	R9	R9
+EOF

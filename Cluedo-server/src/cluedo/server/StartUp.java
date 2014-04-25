@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import cluedo.server.definition.DefinitionManager;
 import crossnet.log.Log;
 
 /**
@@ -19,7 +20,7 @@ public class StartUp {
 	public static void main( String[] args ) {
 		int port = 0;
 		int noPlayers = 0;
-		Path definition = null;
+		Path definitionPath = null;
 		if ( args.length > 0 ) {
 			Log.info( "Cluedo-server", "Parsing command line arguments" );
 			boolean argParseError = false;
@@ -45,10 +46,10 @@ public class StartUp {
 				}
 
 				// Validate path of Definition file
-				definition = Paths.get( arg );
-				if ( !Files.exists( definition ) ) {
+				definitionPath = Paths.get( arg );
+				if ( !Files.exists( definitionPath ) ) {
 					argParseError = true;
-					definition = null;
+					definitionPath = null;
 					Log.warn( "Cluedo-server", "Definition path not valid: " + arg );
 				}
 			}
@@ -77,12 +78,12 @@ public class StartUp {
 			Log.info( "Cluedo-server", "Number of players: " + noPlayers );
 		}
 
-		if ( definition == null ) {
+		if ( definitionPath == null ) {
 			Log.info( "Cluedo-server", "Definition not specified. Will use default." );
 		} else {
-			Log.info( "Cluedo-server", "Definition: " + definition.getFileName() );
+			Log.info( "Cluedo-server", "Using definition '" + DefinitionManager.pathToDefinitionName( definitionPath ) + "' at: " + definitionPath );
 		}
 
-		CluedoServer cluedoServer = new CluedoServer( port, noPlayers, definition );
+		CluedoServer cluedoServer = new CluedoServer( port, noPlayers, definitionPath );
 	}
 }

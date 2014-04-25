@@ -18,6 +18,7 @@ import cluedo.common.board.tiles.Wall;
 import cluedo.common.cards.Card;
 import cluedo.common.cards.Card.CardType;
 import cluedo.common.cards.DefaultCard;
+import crossnet.log.Log;
 
 /**
  * Utility class that contains all the necessary methods for parsing text and constructing a {@link Definition}.
@@ -170,8 +171,7 @@ public class DefinitionParser {
 		int lastIndex = 0;
 		for ( int i = 0; i < indicies.size(); i++ ) {
 			if ( ( lastIndex + 1 ) != indicies.get( i ) ) {
-				//TODO: Log
-				System.out.println( "Warning. Indicies not consecutive for type '" + startsWith + "'. Expected " + ( lastIndex + 1 ) + " but got " + indicies.get( i ) );
+				Log.warn( "Cluedo-common", "Indicies not consecutive for type '" + startsWith + "'. Expected " + ( lastIndex + 1 ) + " but got " + indicies.get( i ) );
 			}
 			lastIndex++;
 		}
