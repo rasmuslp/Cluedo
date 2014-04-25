@@ -42,6 +42,9 @@ public class DefinitionParser {
 	public static Definition parseDefinitionFromText( final String name, final List< String > text ) throws DefinitionException {
 		ListIterator< String > iterator = text.listIterator();
 
+		// Read minimum and maximum number of players.
+		int[] noPlayers = DefinitionParser.readNoPlayers( iterator );
+
 		// Construct the Cards of the game
 		Map< String, Card > characterCards = DefinitionParser.parseCards( CardType.CHARACTER, "C", iterator );
 		Map< String, Card > roomCards = DefinitionParser.parseCards( CardType.ROOM, "R", iterator );
@@ -66,7 +69,29 @@ public class DefinitionParser {
 		List< Card > roomCardList = new ArrayList<>( roomCards.values() );
 		List< Card > weaponCardList = new ArrayList<>( weaponCards.values() );
 
-		return new Definition( name, characterCardList, roomCardList, weaponCardList, parsedBoard );
+		return new Definition( name, noPlayers[0], noPlayers[1], characterCardList, roomCardList, weaponCardList, parsedBoard );
+	}
+
+	/**
+	 * Reads a line that denotes the minimum and maximum number of players.
+	 * 
+	 * @param iterator
+	 *            For the line.
+	 * @return Array of length two. First element is the minimum- and second element if the maximum- number of players.
+	 * @throws DefinitionException
+	 *             If for any reason an error occurred that prevented the determination of min/max number of players.
+	 */
+	public static int[] readNoPlayers( final ListIterator< String > iterator ) throws DefinitionException {
+		String line = iterator.next();
+		String[] lineSplit = DefinitionParser.splitLine( line, "-", 2 );
+		int[] noPlayers = new int[2];
+		try {
+			noPlayers[0] = Integer.parseInt( lineSplit[0] );
+			noPlayers[1] = Integer.parseInt( lineSplit[1] );
+		} catch ( NumberFormatException e ) {
+			throw new DefinitionException( "Could not parse number of players: " + e.getMessage() );
+		}
+		return noPlayers;
 	}
 
 	/**

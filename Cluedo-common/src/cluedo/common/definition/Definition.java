@@ -15,13 +15,18 @@ import cluedo.common.cards.Card;
 public class Definition {
 
 	private final String name;
+	private final int minNoPlayers;
+	private final int maxNoPlayers;
 	private final List< Card > characterCards;
 	private final List< Card > roomCards;
 	private final List< Card > weaponCards;
 	private final Board board;
 
-	public Definition( final String name, final List< Card > characterCards, final List< Card > roomCards, final List< Card > weaponCards, final Board board ) {
+	public Definition( final String name, final int minNoPlayers, final int maxNoPlayers, final List< Card > characterCards, final List< Card > roomCards, final List< Card > weaponCards,
+			final Board board ) {
 		this.name = name;
+		this.minNoPlayers = minNoPlayers;
+		this.maxNoPlayers = maxNoPlayers;
 		this.characterCards = characterCards;
 		this.roomCards = roomCards;
 		this.weaponCards = weaponCards;
@@ -34,6 +39,14 @@ public class Definition {
 
 	public String getName() {
 		return this.name;
+	}
+
+	public int getMinimumNumberOfPlayers() {
+		return this.minNoPlayers;
+	}
+
+	public int getMaximumNumberOfPlayers() {
+		return this.maxNoPlayers;
 	}
 
 	public List< Card > getCharacterCards() {
