@@ -3,6 +3,8 @@ package cluedo.common.definition;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import cluedo.common.board.Board;
 import cluedo.common.cards.Card;
@@ -14,9 +16,13 @@ import cluedo.common.cards.Card;
  */
 public class Definition {
 
+	//TODO: Consider the location of this
+	public static Definition definition;
+
 	private final String name;
 	private final int minNoPlayers;
 	private final int maxNoPlayers;
+	private final Map< String, Card > allCards = new TreeMap<>();
 	private final List< Card > characterCards;
 	private final List< Card > roomCards;
 	private final List< Card > weaponCards;
@@ -35,6 +41,16 @@ public class Definition {
 		Collections.sort( this.characterCards );
 		Collections.sort( this.roomCards );
 		Collections.sort( this.weaponCards );
+
+		for ( Card card : this.characterCards ) {
+			this.allCards.put( card.getID(), card );
+		}
+		for ( Card card : this.roomCards ) {
+			this.allCards.put( card.getID(), card );
+		}
+		for ( Card card : this.weaponCards ) {
+			this.allCards.put( card.getID(), card );
+		}
 	}
 
 	public String getName() {
@@ -47,6 +63,10 @@ public class Definition {
 
 	public int getMaximumNumberOfPlayers() {
 		return this.maxNoPlayers;
+	}
+
+	public Map< String, Card > getAllCards() {
+		return new TreeMap<>( this.allCards );
 	}
 
 	public List< Card > getCharacterCards() {

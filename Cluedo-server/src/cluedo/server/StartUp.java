@@ -20,7 +20,7 @@ import crossnet.log.LogLevel;
 public class StartUp {
 
 	public static void main( String[] args ) throws IOException {
-		Log.set( LogLevel.TRACE );
+		Log.set( LogLevel.DEBUG );
 
 		int port = 0;
 		int noPlayers = 0;

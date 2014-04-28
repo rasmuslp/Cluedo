@@ -69,7 +69,10 @@ public class DefinitionParser {
 		List< Card > roomCardList = new ArrayList<>( roomCards.values() );
 		List< Card > weaponCardList = new ArrayList<>( weaponCards.values() );
 
-		return new Definition( name, noPlayers[0], noPlayers[1], characterCardList, roomCardList, weaponCardList, parsedBoard );
+		//TODO: Consider location of this.
+		Definition.definition = new Definition( name, noPlayers[0], noPlayers[1], characterCardList, roomCardList, weaponCardList, parsedBoard );
+
+		return Definition.definition;
 	}
 
 	/**
