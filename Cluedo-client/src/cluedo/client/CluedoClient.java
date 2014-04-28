@@ -109,6 +109,13 @@ public class CluedoClient {
 	public void loop() {
 		while ( true ) {
 			// Stay a while, and listen.
+
+			try {
+				Thread.sleep( 100 );
+			} catch ( InterruptedException e ) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }
