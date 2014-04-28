@@ -1,15 +1,15 @@
-package cluedo.client;
+package cluedo.common.message;
 
-import cluedo.common.message.CluedoMessageType;
 import cluedo.common.message.server.DefinitionMessage;
+import cluedo.common.message.server.StartingMessage;
 import crossnet.log.Log;
 import crossnet.message.AbstractMessageParser;
 import crossnet.message.Message;
 import crossnet.util.ByteArrayReader;
 
-public class ClientMessageParser extends AbstractMessageParser< CluedoMessageType > {
+public class CluedoMessageParser extends AbstractMessageParser< CluedoMessageType > {
 
-	public ClientMessageParser() {
+	public CluedoMessageParser() {
 		super( CluedoMessageType.class );
 	}
 
@@ -25,13 +25,14 @@ public class ClientMessageParser extends AbstractMessageParser< CluedoMessageTyp
 				message = DefinitionMessage.parse( payload );
 				break;
 
-			// Client Messages
-			case C_DUMMY:
-				Log.error( "Cluedo-client", "Client received Client CluedoMessageType. This makes no sense. Type was: " + messageType );
+			case S_STARTING:
+				message = StartingMessage.parse( payload );
 				break;
 
+			// Client Messages
+
 			default:
-				Log.error( "Cluedo-client", "Unknown CluedoMessageType, cannot parse: " + messageType );
+				Log.error( "Cluedo-common", "Unknown CluedoMessageType, cannot parse: " + messageType );
 				break;
 		}
 

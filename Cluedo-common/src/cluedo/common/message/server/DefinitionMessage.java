@@ -20,7 +20,6 @@ public class DefinitionMessage extends CluedoListMessage< String > {
 	@Override
 	protected void serializeStatic( ByteArrayWriter to ) throws IOException {
 		// No static information to serialise.
-
 	}
 
 	@Override

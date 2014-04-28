@@ -8,8 +8,8 @@ public enum CluedoMessageType {
 
 	S_DEFINITION,
 
-	// Client Messages
+	S_STARTING,
 
-	C_DUMMY,
+	// Client Messages
 
 }
