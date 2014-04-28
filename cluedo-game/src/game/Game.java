@@ -4,9 +4,9 @@ import game.cards.Card;
 import game.cards.CaseFile;
 import game.cards.ThreeCardPack;
 import game.definition.Definition;
-import game.player.AiPlayer;
-import game.player.HumanPlayer;
-import game.player.Player;
+import game.player.AiCluedoPlayer;
+import game.player.HumanCluedoPlayer;
+import game.player.CluedoPlayer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +22,7 @@ public class Game {
 
 	private final Definition definition;
 
-	private final ArrayList< Player > players = new ArrayList<>();
+	private final ArrayList< CluedoPlayer > cluedoPlayers = new ArrayList<>();
 
 	private CaseFile caseFile;
 
@@ -30,10 +30,10 @@ public class Game {
 		this.definition = definition;
 
 		if ( humanParticipation ) {
-			this.players.add( new HumanPlayer( this.definition ) );
+			this.cluedoPlayers.add( new HumanCluedoPlayer( this.definition ) );
 		}
-		while ( this.players.size() < numberOfPlayers ) {
-			this.players.add( new AiPlayer( this.definition, "AI Player, no. " + ( this.players.size() + 1 ) ) );
+		while ( this.cluedoPlayers.size() < numberOfPlayers ) {
+			this.cluedoPlayers.add( new AiCluedoPlayer( this.definition, "AI CluedoPlayer, no. " + ( this.cluedoPlayers.size() + 1 ) ) );
 		}
 	}
 
@@ -66,16 +66,16 @@ public class Game {
 		deck.addAll( weaponCards );
 		Collections.shuffle( deck, rng );
 
-		// Hand out cards to players
+		// Hand out cards to cluedoPlayers
 		int playerIndex = 0;
 		for ( int i = 0; i < deck.size(); i++ ) {
 			Card card = deck.get( i );
-			this.players.get( playerIndex ).handCard( card );
-			playerIndex = ( playerIndex + 1 ) % this.players.size();
+			this.cluedoPlayers.get( playerIndex ).handCard( card );
+			playerIndex = ( playerIndex + 1 ) % this.cluedoPlayers.size();
 		}
 
-		for ( Player player : this.players ) {
-			System.out.println( player.getName() + " got " + player.getNoCards() + " cards." );
+		for ( CluedoPlayer cluedoPlayer : this.cluedoPlayers ) {
+			System.out.println( cluedoPlayer.getName() + " got " + cluedoPlayer.getNoCards() + " cards." );
 		}
 
 //		Tile[][] board = this.definition.getBoard().getBoard();
@@ -86,7 +86,7 @@ public class Game {
 	}
 
 	public void gameLoop() {
-		Player winningPlayer = null;
+		CluedoPlayer winningCluedoPlayer = null;
 
 		// Index of current player.
 		int currentPlayerNo = -1;
@@ -95,21 +95,21 @@ public class Game {
 		while ( !gameOver ) {
 			/// Determine next player.
 
-			// Counts passive players to detect wrap around.
+			// Counts passive cluedoPlayers to detect wrap around.
 			int passivePlayerCount = 0;
 
 			// Find next active player, if any.
-			Player currentPlayer;
+			CluedoPlayer currentCluedoPlayer;
 			do {
-				if ( passivePlayerCount == this.players.size() ) {
-					// No active players left.
-					currentPlayer = null;
+				if ( passivePlayerCount == this.cluedoPlayers.size() ) {
+					// No active cluedoPlayers left.
+					currentCluedoPlayer = null;
 					break;
 				}
 
-				currentPlayerNo = ( currentPlayerNo + 1 ) % this.players.size();
-				currentPlayer = this.players.get( currentPlayerNo );
-				if ( currentPlayer.isActive() ) {
+				currentPlayerNo = ( currentPlayerNo + 1 ) % this.cluedoPlayers.size();
+				currentCluedoPlayer = this.cluedoPlayers.get( currentPlayerNo );
+				if ( currentCluedoPlayer.isActive() ) {
 					// Found active player.
 					break;
 				}
@@ -117,60 +117,60 @@ public class Game {
 				passivePlayerCount++;
 			} while ( true );
 
-			if ( currentPlayer == null ) {
+			if ( currentCluedoPlayer == null ) {
 				gameOver = true;
 				break;
 			}
 
-			/// Player turn begins.
-			System.out.println( currentPlayer.getName() + " it's your turn." );
+			/// CluedoPlayer turn begins.
+			System.out.println( currentCluedoPlayer.getName() + " it's your turn." );
 
-			// Player must make a suggestion.
-			ThreeCardPack suggestion = currentPlayer.makeSuggestion();
+			// CluedoPlayer must make a suggestion.
+			ThreeCardPack suggestion = currentCluedoPlayer.makeSuggestion();
 
 			// Disprove suggestion loop.
 			boolean noDisporve = false;
 			int nextPlayerNo = currentPlayerNo;
 			while ( true ) {
-				nextPlayerNo = ( nextPlayerNo + 1 ) % this.players.size();
-				Player nextPlayer = this.players.get( nextPlayerNo );
-				if ( currentPlayer == nextPlayer ) {
-					// Wrapped around. No more players to ask.
+				nextPlayerNo = ( nextPlayerNo + 1 ) % this.cluedoPlayers.size();
+				CluedoPlayer nextCluedoPlayer = this.cluedoPlayers.get( nextPlayerNo );
+				if ( currentCluedoPlayer == nextCluedoPlayer ) {
+					// Wrapped around. No more cluedoPlayers to ask.
 					noDisporve = true;
 					break;
 				}
-				Card card = nextPlayer.disproveSuggestion( suggestion );
+				Card card = nextCluedoPlayer.disproveSuggestion( suggestion );
 				if ( card != null ) {
-					currentPlayer.showCard( card );
+					currentCluedoPlayer.showCard( card );
 					break;
 				}
 			}
 
 			// If no one disproves the suggestion, the player may make an accusation.
 			if ( noDisporve ) {
-				System.out.println( "No one disproved " + currentPlayer.getName() + "'s suggestions." );
-				ThreeCardPack accusation = currentPlayer.makeAccusation();
+				System.out.println( "No one disproved " + currentCluedoPlayer.getName() + "'s suggestions." );
+				ThreeCardPack accusation = currentCluedoPlayer.makeAccusation();
 				if ( accusation == null ) {
-					// Player made no accusation
+					// CluedoPlayer made no accusation
 					continue;
 				}
-				System.out.println( currentPlayer.getName() + " goes for it and makes an accusation." );
+				System.out.println( currentCluedoPlayer.getName() + " goes for it and makes an accusation." );
 				if ( this.caseFile.tryAccusation( accusation ) ) {
-					// Player solved the murder.
-					System.out.println( currentPlayer.getName() + " made the right call." );
-					winningPlayer = currentPlayer;
+					// CluedoPlayer solved the murder.
+					System.out.println( currentCluedoPlayer.getName() + " made the right call." );
+					winningCluedoPlayer = currentCluedoPlayer;
 					gameOver = true;
 				} else {
-					// Player looses.
-					System.out.println( currentPlayer.getName() + " made the wrong call and is now a passive player." );
-					currentPlayer.setPassive();
+					// CluedoPlayer looses.
+					System.out.println( currentCluedoPlayer.getName() + " made the wrong call and is now a passive player." );
+					currentCluedoPlayer.setPassive();
 				}
 			}
 		}
 
 		// Announce end of game.
-		if ( winningPlayer != null ) {
-			System.out.println( "The murder was solved by " + winningPlayer.getName() + "!" );
+		if ( winningCluedoPlayer != null ) {
+			System.out.println( "The murder was solved by " + winningCluedoPlayer.getName() + "!" );
 		} else {
 			System.out.println( "No one was able to solve the murder." );
 		}

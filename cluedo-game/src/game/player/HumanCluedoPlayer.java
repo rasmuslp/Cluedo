@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-public class HumanPlayer extends Player {
+public class HumanCluedoPlayer extends CluedoPlayer {
 
-	public HumanPlayer( final Definition definition ) {
+	public HumanCluedoPlayer( final Definition definition ) {
 		super( definition );
 		BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
-		String defaultName = "Human Player";
+		String defaultName = "Human CluedoPlayer";
 		System.out.println( "Enter your player name: ['" + defaultName + "']" );
 		String input = "";
 		try {

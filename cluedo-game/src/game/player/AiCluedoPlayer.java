@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class AiPlayer extends Player {
+public class AiCluedoPlayer extends CluedoPlayer {
 
 	private final List< Card > cardsSeen = new ArrayList<>();
 
@@ -18,7 +18,7 @@ public class AiPlayer extends Player {
 	 */
 	private ThreeCardPack lastSuggestion;
 
-	public AiPlayer( final Definition definition, final String name ) {
+	public AiCluedoPlayer( final Definition definition, final String name ) {
 		super( definition );
 		this.name = name;
 	}
@@ -53,7 +53,7 @@ public class AiPlayer extends Player {
 		this.printCardsSeen();
 
 		System.out.println( this.getName() + " this is the unknown cards:" );
-		Player.printCards( possibleCharacterCards, possibleRoomCards, possibleWeaponCards );
+		CluedoPlayer.printCards( possibleCharacterCards, possibleRoomCards, possibleWeaponCards );
 
 		// Choose cards.
 		Random rng = new Random();
@@ -95,7 +95,7 @@ public class AiPlayer extends Player {
 		List< Card > possibleWeaponCards = this.filterCardsSeenAndOnHand( this.definition.getWeaponCards() );
 
 		System.out.println( this.getName() + " after subtracting seen cards, this is the unknown cards:" );
-		Player.printCards( possibleCharacterCards, possibleRoomCards, possibleWeaponCards );
+		CluedoPlayer.printCards( possibleCharacterCards, possibleRoomCards, possibleWeaponCards );
 
 		if ( possibleCharacterCards.size() > 1 || possibleRoomCards.size() > 1 || possibleWeaponCards.size() > 1 ) {
 			// Still unknowns

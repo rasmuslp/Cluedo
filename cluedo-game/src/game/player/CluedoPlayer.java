@@ -16,7 +16,7 @@ import java.util.Map;
  * @author Rasmus Ljungmann Pedersen <rasmuslp@gmail.com>
  * 
  */
-public abstract class Player {
+public abstract class CluedoPlayer {
 
 	protected final Definition definition;
 
@@ -37,7 +37,7 @@ public abstract class Player {
 	 */
 	protected Map< String, Card > cardsOnHand = new HashMap<>();
 
-	public Player( final Definition definition ) {
+	public CluedoPlayer( final Definition definition ) {
 		this.definition = definition;
 	}
 
