@@ -1,7 +1,6 @@
 package cluedo.common.message.server;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +23,8 @@ public class DefinitionMessage extends CluedoListMessage< String > {
 
 	@Override
 	protected void serializeListObject( int atIndex, ByteArrayWriter to ) throws IOException {
-		byte[] line = this.list.get( atIndex ).getBytes( Charset.forName( "UTF-8" ) );
-		to.writeByte( line.length );
-		to.writeByteArray( line );
+		String line = this.list.get( atIndex );
+		to.writeString255( line );
 	}
 
 	/**
@@ -41,10 +39,7 @@ public class DefinitionMessage extends CluedoListMessage< String > {
 			List< String > lines = new ArrayList<>();
 			int count = payload.readInt();
 			for ( int i = 0; i < count; i++ ) {
-				int lineLength = payload.readUnsignedByte();
-				byte[] lineBytes = new byte[lineLength];
-				payload.readByteArray( lineBytes );
-				String line = new String( lineBytes, Charset.forName( "UTF-8" ) );
+				String line = payload.readString255();
 				lines.add( line );
 			}
 			return new DefinitionMessage( lines );

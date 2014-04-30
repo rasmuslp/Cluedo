@@ -1,7 +1,6 @@
 package cluedo.common.message.client;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import cluedo.common.cards.Card;
 import cluedo.common.cards.ThreeCardPack;
@@ -32,15 +31,9 @@ public class SuggestionMessage extends CluedoMessage {
 
 	@Override
 	protected void serializePayload( ByteArrayWriter to ) throws IOException {
-		byte[] characterCard = this.threeCardPack.getCharacterCard().getID().getBytes( Charset.forName( "UTF-8" ) );
-		to.writeByte( characterCard.length );
-		to.writeByteArray( characterCard );
-		byte[] roomCard = this.threeCardPack.getRoomCard().getID().getBytes( Charset.forName( "UTF-8" ) );
-		to.writeByte( roomCard.length );
-		to.writeByteArray( roomCard );
-		byte[] weaponCard = this.threeCardPack.getWeaponCard().getID().getBytes( Charset.forName( "UTF-8" ) );
-		to.writeByte( weaponCard.length );
-		to.writeByteArray( weaponCard );
+		to.writeString255( this.threeCardPack.getCharacterCard().getID() );
+		to.writeString255( this.threeCardPack.getRoomCard().getID() );
+		to.writeString255( this.threeCardPack.getWeaponCard().getID() );
 	}
 
 	/**
@@ -52,20 +45,9 @@ public class SuggestionMessage extends CluedoMessage {
 	 */
 	public static SuggestionMessage parse( ByteArrayReader payload ) {
 		try {
-			int characterCardLength = payload.readUnsignedByte();
-			byte[] characterCardBytes = new byte[characterCardLength];
-			payload.readByteArray( characterCardBytes );
-			String characterCardID = new String( characterCardBytes, Charset.forName( "UTF-8" ) );
-
-			int roomCardLength = payload.readUnsignedByte();
-			byte[] roomCardBytes = new byte[roomCardLength];
-			payload.readByteArray( roomCardBytes );
-			String roomCardID = new String( roomCardBytes, Charset.forName( "UTF-8" ) );
-
-			int weaponCardLength = payload.readUnsignedByte();
-			byte[] weaponCardBytes = new byte[weaponCardLength];
-			payload.readByteArray( weaponCardBytes );
-			String weaponCardID = new String( weaponCardBytes, Charset.forName( "UTF-8" ) );
+			String characterCardID = payload.readString255();
+			String roomCardID = payload.readString255();
+			String weaponCardID = payload.readString255();
 
 			Card characterCard = Definition.definition.getAllCards().get( characterCardID );
 			Card roomCard = Definition.definition.getAllCards().get( roomCardID );

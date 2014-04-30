@@ -1,7 +1,6 @@
 package cluedo.common.message.server;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import cluedo.common.cards.Card;
 import cluedo.common.definition.Definition;
@@ -26,7 +25,7 @@ public class HandCardMessage extends CluedoMessage {
 
 	@Override
 	protected void serializePayload( ByteArrayWriter to ) throws IOException {
-		to.writeByteArray( this.card.getID().getBytes( Charset.forName( "UTF-8" ) ) );
+		to.writeString255( this.card.getID() );
 	}
 
 	/**
@@ -38,11 +37,8 @@ public class HandCardMessage extends CluedoMessage {
 	 */
 	public static HandCardMessage parse( ByteArrayReader payload ) {
 		try {
-			int bytes = payload.bytesAvailable();
-			byte[] data = new byte[bytes];
-			payload.readByteArray( data );
-			String name = new String( data, Charset.forName( "UTF-8" ) );
-			Card card = Definition.definition.getAllCards().get( name );
+			String cardID = payload.readString255();
+			Card card = Definition.definition.getAllCards().get( cardID );
 			return new HandCardMessage( card );
 		} catch ( IOException e ) {
 			Log.error( "Cluedo-common", "Error deserializing HandCardMessage:", e );

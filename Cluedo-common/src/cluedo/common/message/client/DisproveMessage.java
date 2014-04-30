@@ -1,7 +1,6 @@
 package cluedo.common.message.client;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +34,7 @@ public class DisproveMessage extends CluedoListMessage< Card > {
 	@Override
 	protected void serializeListObject( int atIndex, ByteArrayWriter to ) throws IOException {
 		Card card = this.list.get( atIndex );
-		byte[] cardbytes = card.getID().getBytes( Charset.forName( "UTF-8" ) );
-		to.writeByte( cardbytes.length );
-		to.writeByteArray( cardbytes );
+		to.writeString255( card.getID() );
 	}
 
 	/**
@@ -52,11 +49,8 @@ public class DisproveMessage extends CluedoListMessage< Card > {
 			List< Card > cards = new ArrayList<>();
 			int count = payload.readInt();
 			for ( int i = 0; i < count; i++ ) {
-				int nameLength = payload.readUnsignedByte();
-				byte[] nameBytes = new byte[nameLength];
-				payload.readByteArray( nameBytes );
-				String name = new String( nameBytes, Charset.forName( "UTF-8" ) );
-				cards.add( Definition.definition.getAllCards().get( name ) );
+				String cardID = payload.readString255();
+				cards.add( Definition.definition.getAllCards().get( cardID ) );
 			}
 			return new DisproveMessage( cards );
 		} catch ( IOException e ) {
