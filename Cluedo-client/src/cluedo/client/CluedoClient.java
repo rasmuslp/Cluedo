@@ -144,7 +144,7 @@ public class CluedoClient {
 							CluedoClient.this.glhfClient.send( new AccusationMessage( threeCardPack ) );
 						}
 					}
-				} else if ( !( message instanceof GlhfMessage || message instanceof GlhfListMessage || message instanceof CrossNetMessage ) ) {
+				} else if ( !( ( message instanceof GlhfMessage ) || ( message instanceof GlhfListMessage ) || ( message instanceof CrossNetMessage ) ) ) {
 					Log.warn( "Cluedo-client", "Got unexpected Message Type: " + message.getClass().getSimpleName() );
 				}
 

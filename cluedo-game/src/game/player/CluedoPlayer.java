@@ -77,9 +77,7 @@ public abstract class CluedoPlayer {
 	}
 
 	/**
-	 * Gets the number of cards on this players hand.
-	 * 
-	 * @return
+	 * @return The number of cards on this players hand.
 	 */
 	public int getNoCards() {
 		return this.cardsOnHand.size();

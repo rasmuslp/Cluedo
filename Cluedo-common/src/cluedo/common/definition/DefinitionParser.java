@@ -263,7 +263,7 @@ public class DefinitionParser {
 		}
 
 		// Determine size 
-		if ( !( lines.size() > 0 && lines.get( 0 ).length > 1 ) ) {
+		if ( !( ( lines.size() > 0 ) && ( lines.get( 0 ).length > 1 ) ) ) {
 			throw new DefinitionException( "Error reading board. Board is empty." );
 		}
 		int rows = lines.size();
@@ -424,7 +424,7 @@ public class DefinitionParser {
 						if ( other instanceof Hallway ) {
 							// Hallway to Hallway link
 							tile.addAccessibleNeighbour( other );
-						} else if ( other instanceof Room && ( (Hallway) tile ).isPreEntrance() ) {
+						} else if ( ( other instanceof Room ) && ( (Hallway) tile ).isPreEntrance() ) {
 							// Possible Room to Hallway link
 							if ( entrances.containsKey( new Position( position.getRow(), position.getColumn() ) ) ) {
 								// Indeed, this position in the Room is an Entrance, link awaaaaaay...
@@ -452,7 +452,7 @@ public class DefinitionParser {
 		for ( int row = 0; row < rows; row++ ) {
 			for ( int col = 0; col < cols; col++ ) {
 				Tile tile = board[row][col];
-				if ( tile instanceof Hallway && ( (Hallway) tile ).isPreEntrance() ) {
+				if ( ( tile instanceof Hallway ) && ( (Hallway) tile ).isPreEntrance() ) {
 					Set< Tile > neighbours = tile.getAccessibleNeighbours();
 					boolean roomSeen = false;
 					for ( Tile neighbour : neighbours ) {
@@ -473,7 +473,7 @@ public class DefinitionParser {
 	}
 
 	/**
-	 * Given a 2D String representation of a board and a position, it determines the neighbours that {@link startsWith}.
+	 * Given a 2D String representation of a board and a position, it determines the neighbours that {@code startsWith}.
 	 * 
 	 * @param board
 	 *            A 2D array of the board as Strings.
@@ -498,14 +498,14 @@ public class DefinitionParser {
 			}
 		}
 
-		if ( startCol < cols - 1 ) {
+		if ( startCol < ( cols - 1 ) ) {
 			// East
 			if ( board[startRow][startCol + 1].startsWith( startsWith ) ) {
 				neigbours.add( new Position( startRow, startCol + 1 ) );
 			}
 		}
 
-		if ( startRow < rows - 1 ) {
+		if ( startRow < ( rows - 1 ) ) {
 			// South
 			if ( board[startRow + 1][startCol].startsWith( startsWith ) ) {
 				neigbours.add( new Position( startRow + 1, startCol ) );

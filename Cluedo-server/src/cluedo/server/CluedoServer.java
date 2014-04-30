@@ -107,14 +107,14 @@ public class CluedoServer {
 
 			@Override
 			public void received( Connection connection, Message message ) {
-				if ( message instanceof SuggestionMessage || message instanceof DisproveMessage || message instanceof TurnEndMessage || message instanceof AccusationMessage ) {
+				if ( ( message instanceof SuggestionMessage ) || ( message instanceof DisproveMessage ) || ( message instanceof TurnEndMessage ) || ( message instanceof AccusationMessage ) ) {
 					try {
 						CluedoServer.this.cluedoPlayers.get( connection.getID() ).incommingMessages.put( message );
 					} catch ( InterruptedException e ) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				} else if ( !( message instanceof GlhfMessage || message instanceof GlhfListMessage || message instanceof CrossNetMessage ) ) {
+				} else if ( !( ( message instanceof GlhfMessage ) || ( message instanceof GlhfListMessage ) || ( message instanceof CrossNetMessage ) ) ) {
 					Log.warn( "Cluedo-server", "Got unexpected Message Type: " + message.getClass().getSimpleName() );
 				}
 			}

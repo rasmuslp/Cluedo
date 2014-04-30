@@ -79,9 +79,7 @@ public class CluedoPlayer {
 	}
 
 	/**
-	 * Gets the number of cards on this players hand.
-	 * 
-	 * @return
+	 * @return The number of cards on this players hand.
 	 */
 	public int getNoCards() {
 		return this.cardsOnHand.size();
@@ -224,7 +222,7 @@ public class CluedoPlayer {
 		System.out.println( this.getName() + " after subtracting seen cards, this is the unknown cards:" );
 		CluedoPlayer.printCards( possibleCharacterCards, possibleRoomCards, possibleWeaponCards );
 
-		if ( possibleCharacterCards.size() > 1 || possibleRoomCards.size() > 1 || possibleWeaponCards.size() > 1 ) {
+		if ( ( possibleCharacterCards.size() > 1 ) || ( possibleRoomCards.size() > 1 ) || ( possibleWeaponCards.size() > 1 ) ) {
 			// Still unknowns
 			System.out.println( this.getName() + " 'I'm not even sure, but this must be right'" );
 		}
