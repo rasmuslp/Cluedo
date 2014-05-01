@@ -4,7 +4,6 @@ import glhf.common.message.GlhfListMessage;
 import glhf.common.message.GlhfMessage;
 import glhf.common.message.common.ChatMessage;
 import glhf.common.player.Player;
-import glhf.server.GlhfConnection;
 import glhf.server.GlhfServer;
 
 import java.io.IOException;
@@ -87,14 +86,13 @@ public class CluedoServer {
 
 			@Override
 			public void connected( Connection connection ) {
-				GlhfConnection glhfConnection = (GlhfConnection) connection;
 				if ( CluedoServer.this.glhfServer.getPlayers().size() > CluedoServer.this.noPlayers ) {
 					// Kick
-					glhfConnection.send( new ChatMessage( "Game full." ) );
+					connection.send( new ChatMessage( "Game full." ) );
 					connection.close();
 				} else {
 					// Allow join
-					glhfConnection.send( new DefinitionMessage( CluedoServer.this.definitionText ) );
+					connection.send( new DefinitionMessage( CluedoServer.this.definitionText ) );
 					CluedoServer.this.cluedoPlayers.put( connection.getID(), new ServerCluedoPlayer() );
 				}
 

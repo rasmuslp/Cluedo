@@ -1,6 +1,11 @@
 package cluedo.common.cards;
 
+import java.io.IOException;
+
 import cluedo.common.cards.Card.CardType;
+import cluedo.common.definition.Definition;
+import crossnet.util.ByteArrayReader;
+import crossnet.util.ByteArrayWriter;
 
 /**
  * This is used for suggestions and accusations, as both consists of three cards, one of each type.
@@ -56,6 +61,33 @@ public class ThreeCardPack {
 
 	public Card getWeaponCard() {
 		return this.weaponCard;
+	}
+
+	public void serialize( ByteArrayWriter to ) throws IOException {
+		to.writeString255( this.characterCard.getID() );
+		to.writeString255( this.roomCard.getID() );
+		to.writeString255( this.weaponCard.getID() );
+	}
+
+	/**
+	 * Construct an ThreeCardPack from the provided payload.
+	 * 
+	 * @param payload
+	 *            The payload from which to determine the content of this.
+	 * @return A freshly parsed ThreeCardPack.
+	 * @throws IOException
+	 *             In case of parse errors.
+	 */
+	public static ThreeCardPack parse( ByteArrayReader payload ) throws IOException {
+		String characterCardID = payload.readString255();
+		String roomCardID = payload.readString255();
+		String weaponCardID = payload.readString255();
+
+		Card characterCard = Definition.definition.getAllCards().get( characterCardID );
+		Card roomCard = Definition.definition.getAllCards().get( roomCardID );
+		Card weaponCard = Definition.definition.getAllCards().get( weaponCardID );
+
+		return new ThreeCardPack( characterCard, roomCard, weaponCard );
 	}
 
 }
