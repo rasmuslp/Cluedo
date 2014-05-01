@@ -3,6 +3,7 @@ package cluedo.common.message;
 import cluedo.common.message.client.AccusationMessage;
 import cluedo.common.message.client.DisproveMessage;
 import cluedo.common.message.client.SuggestionMessage;
+import cluedo.common.message.client.TurnEndMessage;
 import cluedo.common.message.server.DefinitionMessage;
 import cluedo.common.message.server.DisproveRequestMessage;
 import cluedo.common.message.server.HandCardMessage;
@@ -52,6 +53,9 @@ public class CluedoMessageParser extends AbstractMessageParser< CluedoMessageTyp
 				break;
 			case C_ACCUSATION:
 				message = AccusationMessage.parse( payload );
+				break;
+			case C_TURN_END:
+				message = TurnEndMessage.parse();
 				break;
 
 			default:

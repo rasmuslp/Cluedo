@@ -24,7 +24,7 @@ public class HandCardMessage extends CluedoMessage {
 	}
 
 	@Override
-	protected void serializePayload( ByteArrayWriter to ) throws IOException {
+	protected void serializeCluedoPayload( ByteArrayWriter to ) throws IOException {
 		to.writeString255( this.card.getID() );
 	}
 

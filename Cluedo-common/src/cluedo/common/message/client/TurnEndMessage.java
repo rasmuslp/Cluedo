@@ -13,8 +13,17 @@ public class TurnEndMessage extends CluedoMessage {
 	}
 
 	@Override
-	protected void serializePayload( ByteArrayWriter to ) throws IOException {
+	protected void serializeCluedoPayload( ByteArrayWriter to ) throws IOException {
 		// No information to serialise.
+	}
+
+	/**
+	 * Constructs a TurnEndMessage from the provided data. (None)
+	 * 
+	 * @return A freshly parsed TurnEndMessage
+	 */
+	public static TurnEndMessage parse() {
+		return new TurnEndMessage();
 	}
 
 }

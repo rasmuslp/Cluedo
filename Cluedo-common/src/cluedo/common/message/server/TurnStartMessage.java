@@ -22,7 +22,7 @@ public class TurnStartMessage extends CluedoMessage {
 	}
 
 	@Override
-	protected void serializePayload( ByteArrayWriter to ) throws IOException {
+	protected void serializeCluedoPayload( ByteArrayWriter to ) throws IOException {
 		to.writeInt( this.id );
 	}
 
