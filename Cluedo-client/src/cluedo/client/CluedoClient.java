@@ -185,7 +185,7 @@ public class CluedoClient {
 					}
 
 					default:
-						// Ignored
+						Log.warn( "Cluedo-client", "Got unknown Message Type: " + ( (CluedoMessage) message ).getCluedoType() );
 						break;
 				}
 			}

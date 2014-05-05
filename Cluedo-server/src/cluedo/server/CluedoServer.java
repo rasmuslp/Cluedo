@@ -139,7 +139,7 @@ public class CluedoServer {
 						break;
 
 					default:
-						// Ignored
+						Log.warn( "Cluedo-server", "Got unknown Message Type: " + ( (CluedoMessage) message ).getCluedoType() );
 						break;
 
 				}
