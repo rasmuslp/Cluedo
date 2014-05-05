@@ -1,9 +1,19 @@
 package cluedo.common.message;
 
+import glhf.common.entity.single.IntegerEntity;
+import glhf.common.entity.single.StringEntity;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import cluedo.common.cards.Card;
+import cluedo.common.cards.ThreeCardPack;
+import cluedo.common.definition.Definition;
 import cluedo.common.message.client.AccusationMessage;
-import cluedo.common.message.client.DisproveMessage;
 import cluedo.common.message.client.SuggestionMessage;
 import cluedo.common.message.client.TurnEndMessage;
+import cluedo.common.message.common.DisproveMessage;
 import cluedo.common.message.server.DefinitionMessage;
 import cluedo.common.message.server.DisproveRequestMessage;
 import cluedo.common.message.server.HandCardMessage;
@@ -24,43 +34,90 @@ public class CluedoMessageParser extends AbstractMessageParser< CluedoMessageTyp
 	protected Message parseType( CluedoMessageType messageType, ByteArrayReader payload ) {
 		Message message = null;
 
-		switch ( messageType ) {
-		// Common Messages
+		try {
+			switch ( messageType ) {
 
-		// Server Messages
-			case S_DEFINITION:
-				message = DefinitionMessage.parse( payload );
-				break;
-			case S_STARTING:
-				message = StartingMessage.parse( payload );
-				break;
-			case S_HAND_CARD:
-				message = HandCardMessage.parse( payload );
-				break;
-			case S_TURN_START:
-				message = TurnStartMessage.parse( payload );
-				break;
-			case S_DISPROVE_REQ:
-				message = DisproveRequestMessage.parse( payload );
-				break;
+			// Server Messages
 
-			// Client Messages
-			case C_SUGGESTION:
-				message = SuggestionMessage.parse( payload );
-				break;
-			case C_DISPROVE:
-				message = DisproveMessage.parse( payload );
-				break;
-			case C_ACCUSATION:
-				message = AccusationMessage.parse( payload );
-				break;
-			case C_TURN_END:
-				message = TurnEndMessage.parse();
-				break;
+				case S_DEFINITION: {
+					List< StringEntity > lines = new ArrayList<>();
+					int count = payload.readInt();
+					for ( int i = 0; i < count; i++ ) {
+						String line = payload.readString255();
+						lines.add( new StringEntity( line ) );
+					}
+					message = new DefinitionMessage( lines );
+					break;
+				}
 
-			default:
-				Log.error( "Cluedo-common", "Unknown CluedoMessageType, cannot parse: " + messageType );
-				break;
+				case S_STARTING: {
+					List< IntegerEntity > ids = new ArrayList<>();
+					int count = payload.readInt();
+					for ( int i = 0; i < count; i++ ) {
+						int id = payload.readInt();
+						ids.add( new IntegerEntity( id ) );
+					}
+					message = new StartingMessage( ids );
+					break;
+				}
+
+				case S_HAND_CARD: {
+					String cardID = payload.readString255();
+					Card card = Definition.definition.getAllCards().get( cardID );
+					message = new HandCardMessage( card );
+					break;
+				}
+
+				case S_TURN_START: {
+					int id = payload.readInt();
+					message = new TurnStartMessage( id );
+					break;
+				}
+
+				case S_DISPROVE_REQ: {
+					ThreeCardPack threeCardPack = ThreeCardPack.parse( payload );
+					message = new DisproveRequestMessage( threeCardPack );
+					break;
+				}
+
+				// Client Messages
+
+				case C_SUGGESTION: {
+					ThreeCardPack threeCardPack = ThreeCardPack.parse( payload );
+					message = new SuggestionMessage( threeCardPack );
+					break;
+				}
+
+				case C_ACCUSATION: {
+					ThreeCardPack threeCardPack = ThreeCardPack.parse( payload );
+					message = new AccusationMessage( threeCardPack );
+					break;
+				}
+
+				case C_TURN_END: {
+					message = new TurnEndMessage();
+					break;
+				}
+
+				// Common Messages
+
+				case DISPROVE: {
+					List< Card > cards = new ArrayList<>();
+					int count = payload.readInt();
+					for ( int i = 0; i < count; i++ ) {
+						String cardID = payload.readString255();
+						cards.add( Definition.definition.getAllCards().get( cardID ) );
+					}
+					message = new DisproveMessage( cards );
+					break;
+				}
+
+				default:
+					Log.error( "Cluedo-common", "Unknown CluedoMessageType, cannot parse: " + messageType );
+					break;
+			}
+		} catch ( IOException e ) {
+			Log.error( "Cluedo-common", "Error deserializing CluedoMessage of type:" + messageType, e );
 		}
 
 		return message;

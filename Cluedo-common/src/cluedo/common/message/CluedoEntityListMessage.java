@@ -1,26 +1,36 @@
 package cluedo.common.message;
 
+import glhf.common.entity.Entity;
+
 import java.io.IOException;
 import java.util.List;
 
 import crossnet.util.ByteArrayWriter;
 
 /**
- * Abstract Message that is used internally to maintain state. Has a List as a part of the payload.
+ * Abstract Message that can transport a list of Entities.
  * 
  * @author Rasmus Ljungmann Pedersen <rasmuslp@gmail.com>
  * 
  * @param <T>
- *            The list type.
+ *            The type of Entity in the list.
  */
-public abstract class CluedoListMessage< T > extends CluedoMessage {
+public abstract class CluedoEntityListMessage< T extends Entity > extends CluedoMessage {
 
 	/**
-	 * The list payload.
+	 * The Entity list.
 	 */
 	protected final List< T > list;
 
-	public CluedoListMessage( CluedoMessageType messageType, List< T > list ) {
+	/**
+	 * Create a new CluedoEntityListMessage of provided type and list of Entities.
+	 * 
+	 * @param messageType
+	 *            The type of CluedoMessage.
+	 * @param list
+	 *            The list of Entities.
+	 */
+	public CluedoEntityListMessage( CluedoMessageType messageType, List< T > list ) {
 		super( messageType );
 		if ( list == null ) {
 			throw new IllegalArgumentException( "List cannot be null." );
@@ -29,7 +39,7 @@ public abstract class CluedoListMessage< T > extends CluedoMessage {
 	}
 
 	/**
-	 * @return The list payload.
+	 * @return The Entity list.
 	 */
 	public List< T > getList() {
 		return this.list;

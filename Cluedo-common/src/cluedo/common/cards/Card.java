@@ -1,5 +1,6 @@
 package cluedo.common.cards;
 
+import glhf.common.entity.Entity;
 import cluedo.common.definition.Definition;
 
 /**
@@ -10,7 +11,7 @@ import cluedo.common.definition.Definition;
  * @author Rasmus Ljungmann Pedersen <rasmuslp@gmail.com>
  * 
  */
-public interface Card extends Comparable< Card > {
+public interface Card extends Comparable< Card >, Entity {
 
 	/**
 	 * The possible types of cards.

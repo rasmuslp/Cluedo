@@ -19,8 +19,21 @@ public abstract class CluedoMessage extends TieredGlhfMessage {
 	 */
 	protected final CluedoMessageType cluedoMessageType;
 
+	/**
+	 * Create a new CluedoMessage of provided type.
+	 * 
+	 * @param cluedoMessageType
+	 *            The type of CluedoMessage.
+	 */
 	public CluedoMessage( CluedoMessageType cluedoMessageType ) {
 		this.cluedoMessageType = cluedoMessageType;
+	}
+
+	/**
+	 * @return The type of CluedoMessage.
+	 */
+	public CluedoMessageType getCluedoType() {
+		return this.cluedoMessageType;
 	}
 
 	@Override

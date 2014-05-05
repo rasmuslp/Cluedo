@@ -1,5 +1,9 @@
 package cluedo.common.cards;
 
+import java.io.IOException;
+
+import crossnet.util.ByteArrayWriter;
+
 /**
  * Default implementation of a {@link Card}.
  * 
@@ -82,6 +86,11 @@ public class DefaultCard implements Card {
 		}
 
 		return true;
+	}
+
+	@Override
+	public void serialise( ByteArrayWriter to ) throws IOException {
+		to.writeString255( this.ID );
 	}
 
 }

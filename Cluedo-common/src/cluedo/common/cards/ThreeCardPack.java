@@ -1,5 +1,7 @@
 package cluedo.common.cards;
 
+import glhf.common.entity.Entity;
+
 import java.io.IOException;
 
 import cluedo.common.cards.Card.CardType;
@@ -13,7 +15,7 @@ import crossnet.util.ByteArrayWriter;
  * @author Rasmus Ljungmann Pedersen <rasmuslp@gmail.com>
  * 
  */
-public class ThreeCardPack {
+public class ThreeCardPack implements Entity {
 
 	private final Card characterCard;
 	private final Card roomCard;
@@ -63,7 +65,8 @@ public class ThreeCardPack {
 		return this.weaponCard;
 	}
 
-	public void serialize( ByteArrayWriter to ) throws IOException {
+	@Override
+	public void serialise( ByteArrayWriter to ) throws IOException {
 		to.writeString255( this.characterCard.getID() );
 		to.writeString255( this.roomCard.getID() );
 		to.writeString255( this.weaponCard.getID() );

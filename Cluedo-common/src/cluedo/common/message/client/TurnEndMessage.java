@@ -17,13 +17,4 @@ public class TurnEndMessage extends CluedoMessage {
 		// No information to serialise.
 	}
 
-	/**
-	 * Constructs a TurnEndMessage from the provided data. (None)
-	 * 
-	 * @return A freshly parsed TurnEndMessage
-	 */
-	public static TurnEndMessage parse() {
-		return new TurnEndMessage();
-	}
-
 }

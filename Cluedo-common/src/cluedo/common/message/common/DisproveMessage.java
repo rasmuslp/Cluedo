@@ -1,18 +1,25 @@
-package cluedo.common.message.server;
-
-import glhf.common.entity.single.StringEntity;
+package cluedo.common.message.common;
 
 import java.io.IOException;
 import java.util.List;
 
+import cluedo.common.cards.Card;
 import cluedo.common.message.CluedoEntityListMessage;
 import cluedo.common.message.CluedoMessageType;
 import crossnet.util.ByteArrayWriter;
 
-public class DefinitionMessage extends CluedoEntityListMessage< StringEntity > {
+public class DisproveMessage extends CluedoEntityListMessage< Card > {
 
-	public DefinitionMessage( List< StringEntity > text ) {
-		super( CluedoMessageType.S_DEFINITION, text );
+	public DisproveMessage( List< Card > list ) {
+		super( CluedoMessageType.DISPROVE, list );
+	}
+
+	public boolean disproved() {
+		if ( this.list.size() == 0 ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override

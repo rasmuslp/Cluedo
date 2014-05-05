@@ -2,8 +2,6 @@ package cluedo.common.message;
 
 public enum CluedoMessageType {
 
-	// Common Messages
-
 	// Server Messages
 
 	S_DEFINITION,
@@ -20,10 +18,12 @@ public enum CluedoMessageType {
 
 	C_SUGGESTION,
 
-	C_DISPROVE,
-
 	C_ACCUSATION,
 
 	C_TURN_END,
+
+	// Common Messages
+
+	DISPROVE,
 
 }

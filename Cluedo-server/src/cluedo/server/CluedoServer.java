@@ -1,7 +1,7 @@
 package cluedo.server;
 
-import glhf.common.message.GlhfListMessage;
-import glhf.common.message.GlhfMessage;
+import glhf.common.entity.single.IntegerEntity;
+import glhf.common.entity.single.StringEntity;
 import glhf.common.message.common.ChatMessage;
 import glhf.common.player.Player;
 import glhf.server.GlhfServer;
@@ -19,11 +19,12 @@ import cluedo.common.cards.CaseFile;
 import cluedo.common.cards.ThreeCardPack;
 import cluedo.common.definition.Definition;
 import cluedo.common.definition.DefinitionException;
+import cluedo.common.message.CluedoMessage;
 import cluedo.common.message.CluedoMessageParser;
 import cluedo.common.message.client.AccusationMessage;
-import cluedo.common.message.client.DisproveMessage;
 import cluedo.common.message.client.SuggestionMessage;
 import cluedo.common.message.client.TurnEndMessage;
+import cluedo.common.message.common.DisproveMessage;
 import cluedo.common.message.server.DefinitionMessage;
 import cluedo.common.message.server.DisproveRequestMessage;
 import cluedo.common.message.server.HandCardMessage;
@@ -34,7 +35,6 @@ import crossnet.Connection;
 import crossnet.listener.ConnectionListenerAdapter;
 import crossnet.log.Log;
 import crossnet.message.Message;
-import crossnet.message.crossnet.CrossNetMessage;
 
 public class CluedoServer {
 
@@ -92,7 +92,11 @@ public class CluedoServer {
 					connection.close();
 				} else {
 					// Allow join
-					connection.send( new DefinitionMessage( CluedoServer.this.definitionText ) );
+					List< StringEntity > definitionList = new ArrayList<>();
+					for ( String line : CluedoServer.this.definitionText ) {
+						definitionList.add( new StringEntity( line ) );
+					}
+					connection.send( new DefinitionMessage( definitionList ) );
 					CluedoServer.this.cluedoPlayers.put( connection.getID(), new ServerCluedoPlayer() );
 				}
 
@@ -105,15 +109,38 @@ public class CluedoServer {
 
 			@Override
 			public void received( Connection connection, Message message ) {
-				if ( ( message instanceof SuggestionMessage ) || ( message instanceof DisproveMessage ) || ( message instanceof TurnEndMessage ) || ( message instanceof AccusationMessage ) ) {
-					try {
-						CluedoServer.this.cluedoPlayers.get( connection.getID() ).incommingMessages.put( message );
-					} catch ( InterruptedException e ) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				} else if ( !( ( message instanceof GlhfMessage ) || ( message instanceof GlhfListMessage ) || ( message instanceof CrossNetMessage ) ) ) {
-					Log.warn( "Cluedo-server", "Got unexpected Message Type: " + message.getClass().getSimpleName() );
+				if ( !( message instanceof CluedoMessage ) ) {
+					return;
+				}
+
+				switch ( ( (CluedoMessage) message ).getCluedoType() ) {
+
+				// Server Messages
+					case S_DEFINITION:
+					case S_STARTING:
+					case S_HAND_CARD:
+					case S_TURN_START:
+					case S_DISPROVE_REQ:
+						Log.warn( "Cluedo-server", "Got unexpected Message Type: " + message.getMessageClass() );
+						break;
+
+					// Client Messages
+					case C_SUGGESTION:
+					case DISPROVE:
+					case C_ACCUSATION:
+					case C_TURN_END:
+						try {
+							CluedoServer.this.cluedoPlayers.get( connection.getID() ).incommingMessages.put( message );
+						} catch ( InterruptedException e ) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						break;
+
+					default:
+						// Ignored
+						break;
+
 				}
 			}
 		} );
@@ -141,9 +168,9 @@ public class CluedoServer {
 
 			if ( !this.gameRunning ) {
 				if ( this.allReady() ) {
-					List< Integer > list = new ArrayList<>();
+					List< IntegerEntity > list = new ArrayList<>();
 					for ( Integer id : this.cluedoPlayers.keySet() ) {
-						list.add( id );
+						list.add( new IntegerEntity( id ) );
 					}
 					this.glhfServer.sendToAll( new StartingMessage( list ) );
 					this.prepareGame();
@@ -197,7 +224,7 @@ public class CluedoServer {
 						try {
 							Message message = this.cluedoPlayers.get( currentPlayerID ).incommingMessages.take();
 							if ( message instanceof SuggestionMessage ) {
-								threeCardPack = ( (SuggestionMessage) message ).getThreeCardPack();
+								threeCardPack = ( (SuggestionMessage) message ).getSuggestion();
 								disproverID = this.getNextToDisprove( currentPlayerID, currentPlayerID );
 								this.glhfServer.getConnections().get( disproverID ).send( new DisproveRequestMessage( threeCardPack ) );
 								turnState = TurnState.DISPROVE;
@@ -250,7 +277,7 @@ public class CluedoServer {
 								currentPlayer = null;
 							} else if ( message instanceof AccusationMessage ) {
 								Log.info( "Cluedo-server", currentPlayer.getName() + " goes for it and makes an accusation. (" + currentPlayerID + ")" );
-								ThreeCardPack accusation = ( (AccusationMessage) message ).getThreeCardPack();
+								ThreeCardPack accusation = ( (AccusationMessage) message ).getAccusation();
 
 								if ( this.caseFile.tryAccusation( accusation ) ) {
 									// Player solved the murder.

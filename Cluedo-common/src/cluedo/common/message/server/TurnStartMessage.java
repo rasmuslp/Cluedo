@@ -1,46 +1,17 @@
 package cluedo.common.message.server;
 
-import java.io.IOException;
-
-import cluedo.common.message.CluedoMessage;
+import glhf.common.entity.single.IntegerEntity;
+import cluedo.common.message.CluedoEntityMessage;
 import cluedo.common.message.CluedoMessageType;
-import crossnet.log.Log;
-import crossnet.util.ByteArrayReader;
-import crossnet.util.ByteArrayWriter;
 
-public class TurnStartMessage extends CluedoMessage {
-
-	private final int id;
+public class TurnStartMessage extends CluedoEntityMessage< IntegerEntity > {
 
 	public TurnStartMessage( int id ) {
-		super( CluedoMessageType.S_TURN_START );
-		this.id = id;
+		super( CluedoMessageType.S_TURN_START, new IntegerEntity( id ) );
 	}
 
 	public int getID() {
-		return this.id;
+		return this.getEntity().get();
 	}
 
-	@Override
-	protected void serializeCluedoPayload( ByteArrayWriter to ) throws IOException {
-		to.writeInt( this.id );
-	}
-
-	/**
-	 * Construct an TurnStartMessage from the provided payload.
-	 * 
-	 * @param payload
-	 *            The payload from which to determine the content of this.
-	 * @return A freshly parsed TurnStartMessage.
-	 */
-	public static TurnStartMessage parse( ByteArrayReader payload ) {
-		try {
-			int id = payload.readInt();
-			return new TurnStartMessage( id );
-		} catch ( IOException e ) {
-			Log.error( "Cluedo-common", "Error deserializing TurnStartMessage:", e );
-		}
-
-		return null;
-	}
 }
