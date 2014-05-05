@@ -1,6 +1,7 @@
 package cluedo.client;
 
 import glhf.client.GlhfClient;
+import glhf.common.entity.EntityList;
 import glhf.common.entity.single.IntegerEntity;
 import glhf.common.entity.single.StringEntity;
 import glhf.common.player.Player;
@@ -99,7 +100,7 @@ public class CluedoClient {
 						// Parse Definition
 						try {
 							List< String > definitionText = new ArrayList<>();
-							for ( StringEntity line : definitionMessage.getList() ) {
+							for ( StringEntity line : definitionMessage.getEntity() ) {
 								definitionText.add( line.get() );
 							}
 							CluedoClient.this.definition = DefinitionParser.parseDefinitionFromText( "Server provided definition", definitionText );
@@ -117,7 +118,7 @@ public class CluedoClient {
 					case S_STARTING: {
 						StartingMessage startingMessage = (StartingMessage) message;
 						Log.info( "Cluedo-client", "Game starting. Player order:" );
-						for ( IntegerEntity integerEntity : startingMessage.getList() ) {
+						for ( IntegerEntity integerEntity : startingMessage.getEntity() ) {
 							int id = integerEntity.get();
 							Player player = CluedoClient.this.glhfClient.getPlayers().get( id );
 							Log.info( "Cluedo-client", player.getName() + " with ID: " + id );
@@ -146,7 +147,7 @@ public class CluedoClient {
 						// Disprove another players suggestion.
 						ThreeCardPack threeCardPack = ( (DisproveRequestMessage) message ).getSuggestion();
 						Card card = CluedoClient.this.cluedoPlayer.disproveSuggestion( threeCardPack );
-						ArrayList< Card > cards = new ArrayList<>();
+						EntityList< Card > cards = new EntityList<>();
 						if ( card != null ) {
 							cards.add( card );
 
@@ -169,7 +170,7 @@ public class CluedoClient {
 						DisproveMessage disproveMessage = (DisproveMessage) message;
 						if ( disproveMessage.disproved() ) {
 							// Other Player disproved the suggestion.
-							Card card = disproveMessage.getList().get( 0 );
+							Card card = disproveMessage.getEntity().get( 0 );
 							CluedoClient.this.cluedoPlayer.showCard( card );
 						} else {
 							// May make accusation or end turn.

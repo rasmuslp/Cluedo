@@ -1,7 +1,8 @@
 package cluedo.server;
 
-import glhf.common.entity.single.IntegerEntity;
-import glhf.common.entity.single.StringEntity;
+import glhf.common.entity.EntityList;
+import glhf.common.entity.list.IntegerList;
+import glhf.common.entity.list.StringList;
 import glhf.common.message.common.ChatMessage;
 import glhf.common.player.Player;
 import glhf.server.GlhfServer;
@@ -92,9 +93,9 @@ public class CluedoServer {
 					connection.close();
 				} else {
 					// Allow join
-					List< StringEntity > definitionList = new ArrayList<>();
+					StringList definitionList = new StringList();
 					for ( String line : CluedoServer.this.definitionText ) {
-						definitionList.add( new StringEntity( line ) );
+						definitionList.add( line );
 					}
 					connection.send( new DefinitionMessage( definitionList ) );
 					CluedoServer.this.cluedoPlayers.put( connection.getID(), new ServerCluedoPlayer() );
@@ -168,9 +169,9 @@ public class CluedoServer {
 
 			if ( !this.gameRunning ) {
 				if ( this.allReady() ) {
-					List< IntegerEntity > list = new ArrayList<>();
+					IntegerList list = new IntegerList();
 					for ( Integer id : this.cluedoPlayers.keySet() ) {
-						list.add( new IntegerEntity( id ) );
+						list.add( id );
 					}
 					this.glhfServer.sendToAll( new StartingMessage( list ) );
 					this.prepareGame();
@@ -256,7 +257,7 @@ public class CluedoServer {
 
 										// Notify current player
 										//TODO: Seriously hax !
-										this.glhfServer.getConnections().get( currentPlayerID ).send( new DisproveMessage( new ArrayList< Card >() ) );
+										this.glhfServer.getConnections().get( currentPlayerID ).send( new DisproveMessage( new EntityList< Card >() ) );
 										turnState = TurnState.ACCUSATION;
 									} else {
 										this.glhfServer.getConnections().get( disproverID ).send( new DisproveRequestMessage( threeCardPack ) );

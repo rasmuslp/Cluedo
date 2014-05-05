@@ -1,28 +1,13 @@
 package cluedo.common.message.server;
 
-import glhf.common.entity.single.IntegerEntity;
-
-import java.io.IOException;
-import java.util.List;
-
-import cluedo.common.message.CluedoEntityListMessage;
+import glhf.common.entity.list.IntegerList;
+import cluedo.common.message.CluedoEntityMessage;
 import cluedo.common.message.CluedoMessageType;
-import crossnet.util.ByteArrayWriter;
 
-public class StartingMessage extends CluedoEntityListMessage< IntegerEntity > {
+public class StartingMessage extends CluedoEntityMessage< IntegerList > {
 
-	public StartingMessage( List< IntegerEntity > list ) {
+	public StartingMessage( IntegerList list ) {
 		super( CluedoMessageType.S_STARTING, list );
-	}
-
-	@Override
-	protected void serializeStatic( ByteArrayWriter to ) throws IOException {
-		// No static information to serialise.
-	}
-
-	@Override
-	protected void serializeListObject( int atIndex, ByteArrayWriter to ) throws IOException {
-		this.list.get( atIndex ).serialise( to );
 	}
 
 }

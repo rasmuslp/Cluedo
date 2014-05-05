@@ -1,11 +1,10 @@
 package cluedo.common.message;
 
-import glhf.common.entity.single.IntegerEntity;
-import glhf.common.entity.single.StringEntity;
+import glhf.common.entity.EntityList;
+import glhf.common.entity.list.IntegerList;
+import glhf.common.entity.list.StringList;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import cluedo.common.cards.Card;
 import cluedo.common.cards.ThreeCardPack;
@@ -40,22 +39,22 @@ public class CluedoMessageParser extends AbstractMessageParser< CluedoMessageTyp
 			// Server Messages
 
 				case S_DEFINITION: {
-					List< StringEntity > lines = new ArrayList<>();
+					StringList lines = new StringList();
 					int count = payload.readInt();
 					for ( int i = 0; i < count; i++ ) {
 						String line = payload.readString255();
-						lines.add( new StringEntity( line ) );
+						lines.add( line );
 					}
 					message = new DefinitionMessage( lines );
 					break;
 				}
 
 				case S_STARTING: {
-					List< IntegerEntity > ids = new ArrayList<>();
+					IntegerList ids = new IntegerList();
 					int count = payload.readInt();
 					for ( int i = 0; i < count; i++ ) {
 						int id = payload.readInt();
-						ids.add( new IntegerEntity( id ) );
+						ids.add( id );
 					}
 					message = new StartingMessage( ids );
 					break;
@@ -102,7 +101,7 @@ public class CluedoMessageParser extends AbstractMessageParser< CluedoMessageTyp
 				// Common Messages
 
 				case DISPROVE: {
-					List< Card > cards = new ArrayList<>();
+					EntityList< Card > cards = new EntityList<>();
 					int count = payload.readInt();
 					for ( int i = 0; i < count; i++ ) {
 						String cardID = payload.readString255();
