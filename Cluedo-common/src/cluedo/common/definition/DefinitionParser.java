@@ -86,14 +86,27 @@ public class DefinitionParser {
 	 */
 	public static int[] readNoPlayers( final ListIterator< String > iterator ) throws DefinitionException {
 		String line = iterator.next();
-		String[] lineSplit = DefinitionParser.splitLine( line, "-", 2 );
+
+		// Validate identifier
+		String[] lineSplit = DefinitionParser.splitLine( line, ":", 2 );
+		if ( !lineSplit[0].equals( "P" ) ) {
+			throw new DefinitionException( "Could not parse number of players. Unexpected identifier: " + lineSplit[0] );
+		}
+
+		// Read
+		String[] playerSplit = DefinitionParser.splitLine( lineSplit[1], "-", 2 );
 		int[] noPlayers = new int[2];
 		try {
-			noPlayers[0] = Integer.parseInt( lineSplit[0] );
-			noPlayers[1] = Integer.parseInt( lineSplit[1] );
+			noPlayers[0] = Integer.parseInt( playerSplit[0] );
+			noPlayers[1] = Integer.parseInt( playerSplit[1] );
 		} catch ( NumberFormatException e ) {
 			throw new DefinitionException( "Could not parse number of players: " + e.getMessage() );
 		}
+
+		if ( noPlayers[0] > noPlayers[1] ) {
+			throw new DefinitionException( "Could not parse number of players. Minimum cannot be larger than maximum." );
+		}
+
 		return noPlayers;
 	}
 
@@ -154,6 +167,9 @@ public class DefinitionParser {
 		for ( String[] line : lines ) {
 			String ID = line[0];
 			String[] rooms = DefinitionParser.splitLine( line[1], "-", 2 );
+			if ( rooms[0].equals( rooms[1] ) ) {
+				throw new DefinitionException( "Error parsing secret passage. The two rooms cannot be the same. Line was: " + line );
+			}
 			if ( secretPassages.containsKey( ID ) ) {
 				throw new DefinitionException( "Error parsing secret passage. ID '" + ID + "' already used. Line was: " + line );
 			}
