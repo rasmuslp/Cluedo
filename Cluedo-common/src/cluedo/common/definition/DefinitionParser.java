@@ -1,7 +1,6 @@
 package cluedo.common.definition;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +42,7 @@ public class DefinitionParser {
 		ListIterator< String > iterator = text.listIterator();
 
 		// Read minimum and maximum number of players.
-		int[] noPlayers = DefinitionParser.readNoPlayers( iterator );
+		int[] noPlayers = DefinitionParser.parseNoPlayers( iterator );
 
 		// Construct the Cards of the game
 		Map< String, Card > characterCards = DefinitionParser.parseCards( CardType.CHARACTER, "C", iterator );
@@ -51,19 +50,19 @@ public class DefinitionParser {
 		Map< String, Card > weaponCards = DefinitionParser.parseCards( CardType.WEAPON, "W", iterator );
 
 		// Read and do validation of Secret Passages
-		Map< String, String[] > secretPassages = DefinitionParser.readSecretPassages( iterator );
-		for ( Map.Entry< String, String[] > entry : secretPassages.entrySet() ) {
-			if ( !roomCards.containsKey( entry.getValue()[0] ) ) {
-				throw new DefinitionException( "Secret passage '" + entry.getKey() + "' reference unknown room ID: " + entry.getValue()[0] );
+		List< String[] > secretPassages = DefinitionParser.parseSecretPassages( iterator );
+		for ( String[] entry : secretPassages ) {
+			if ( !roomCards.containsKey( entry[0] ) ) {
+				throw new DefinitionException( "Secret passage referenced unknown room ID: " + entry[0] );
 			}
-			if ( !roomCards.containsKey( entry.getValue()[1] ) ) {
-				throw new DefinitionException( "Secret passage '" + entry.getKey() + "' reference unknown room ID: " + entry.getValue()[1] );
+			if ( !roomCards.containsKey( entry[1] ) ) {
+				throw new DefinitionException( "Secret passage referenced unknown room ID: " + entry[1] );
 			}
 		}
 
 		// Read and parse Board
 		String[][] readBoard = DefinitionParser.readBoard( iterator );
-		Board parsedBoard = DefinitionParser.parseBoard( readBoard, characterCards.keySet(), roomCards.keySet(), secretPassages.values() );
+		Board parsedBoard = DefinitionParser.parseBoard( readBoard, characterCards.keySet(), roomCards.keySet(), secretPassages );
 
 		List< Card > characterCardList = new ArrayList<>( characterCards.values() );
 		List< Card > roomCardList = new ArrayList<>( roomCards.values() );
@@ -84,7 +83,7 @@ public class DefinitionParser {
 	 * @throws DefinitionException
 	 *             If for any reason an error occurred that prevented the determination of min/max number of players.
 	 */
-	public static int[] readNoPlayers( final ListIterator< String > iterator ) throws DefinitionException {
+	public static int[] parseNoPlayers( final ListIterator< String > iterator ) throws DefinitionException {
 		String line = iterator.next();
 
 		// Validate identifier
@@ -134,14 +133,14 @@ public class DefinitionParser {
 		Map< String, Card > cards = new HashMap<>();
 
 		// Read and parse cards
-		List< String[] > lines = DefinitionParser.parseLines( startsWith, iterator );
+		List< String[] > lines = DefinitionParser.parseLines( startsWith, iterator, true );
 		for ( String[] line : lines ) {
 			String ID = line[0];
 			String title = line[1];
 
 			Card card = new DefaultCard( type, ID, title );
 			if ( cards.containsKey( ID ) ) {
-				throw new DefinitionException( "Error parsing card. Card ID '" + ID + "' already used. Line was: " + line );
+				throw new DefinitionException( "Error parsing card. Card ID '" + ID + "' already used." );
 			}
 			cards.put( ID, card );
 		}
@@ -150,30 +149,31 @@ public class DefinitionParser {
 	}
 
 	/**
-	 * Reads consecutive text lines that should constitute Secret Passages between Rooms
+	 * Reads consecutive text lines that should constitute Secret Passages between Rooms.
 	 * 
 	 * @param iterator
 	 *            For the lines.
-	 * @return A mapping from ID to pairs of Rooms.
+	 * @return A list of pairs of Room IDs.
 	 * @throws DefinitionException
 	 *             If for any reason an error occurred that prevented the construction of a meaningful Map.
 	 */
-	public static Map< String, String[] > readSecretPassages( final ListIterator< String > iterator ) throws DefinitionException {
-		// Mapping of Secret Passage ID to Room IDs
-		Map< String, String[] > secretPassages = new HashMap<>();
+	public static List< String[] > parseSecretPassages( final ListIterator< String > iterator ) throws DefinitionException {
+		// A list of pairs of Room IDs.
+		List< String[] > secretPassages = new ArrayList<>();
 
-		// Read secret passages
-		List< String[] > lines = DefinitionParser.parseLines( "S", iterator );
+		// Read secret passages.
+		List< String[] > lines = DefinitionParser.parseLines( "S", iterator, false );
 		for ( String[] line : lines ) {
-			String ID = line[0];
 			String[] rooms = DefinitionParser.splitLine( line[1], "-", 2 );
 			if ( rooms[0].equals( rooms[1] ) ) {
-				throw new DefinitionException( "Error parsing secret passage. The two rooms cannot be the same. Line was: " + line );
+				throw new DefinitionException( "Error parsing secret passage. The two rooms cannot be the same: " + line[1] );
 			}
-			if ( secretPassages.containsKey( ID ) ) {
-				throw new DefinitionException( "Error parsing secret passage. ID '" + ID + "' already used. Line was: " + line );
+			for ( String[] secretPassage : secretPassages ) {
+				if ( ( secretPassage[0].equals( rooms[0] ) || secretPassage[0].equals( rooms[1] ) ) && ( secretPassage[1].equals( rooms[0] ) || secretPassage[1].equals( rooms[1] ) ) ) {
+					throw new DefinitionException( "Error parsing secret passage. Rooms already used in other secret passage: " + line[1] );
+				}
 			}
-			secretPassages.put( ID, rooms );
+			secretPassages.add( rooms );
 		}
 
 		return secretPassages;
@@ -181,6 +181,9 @@ public class DefinitionParser {
 
 	/**
 	 * Reads consecutive text lines starting with {@code startsWith}.
+	 * <p>
+	 * If id verification is enabled the lines must be of the form '[startsWith][number]:[remainder]'. Otherwise, leave
+	 * out the number.
 	 * 
 	 * NB: The lines must be of the form 'ID1:Rest'
 	 * 
@@ -188,11 +191,13 @@ public class DefinitionParser {
 	 *            The substring the lines should start with to be considered part of the sought information.
 	 * @param iterator
 	 *            For the lines.
+	 * @param verifyIDs
+	 *            Determines if the IDs are verified as consecutive.
 	 * @return A list of pairs, where a pair is an ID and the rest.
 	 * @throws DefinitionException
 	 *             If a line couldn't be parsed.
 	 */
-	public static List< String[] > parseLines( final String startsWith, final ListIterator< String > iterator ) throws DefinitionException {
+	public static List< String[] > parseLines( final String startsWith, final ListIterator< String > iterator, final boolean verifyIDs ) throws DefinitionException {
 		List< String[] > lines = new ArrayList<>();
 		List< Integer > indicies = new ArrayList<>();
 
@@ -201,8 +206,10 @@ public class DefinitionParser {
 			String line = iterator.next().trim();
 			if ( line.startsWith( startsWith ) ) {
 				String[] split = DefinitionParser.splitLine( line, ":", 2 );
-				String ID = split[0];
-				indicies.add( Integer.parseInt( ID.substring( startsWith.length() ) ) );
+				if ( verifyIDs ) {
+					String ID = split[0];
+					indicies.add( Integer.parseInt( ID.substring( startsWith.length() ) ) );
+				}
 				lines.add( split );
 			} else {
 				// No more lines startsWith
@@ -212,12 +219,14 @@ public class DefinitionParser {
 		}
 
 		// Check indices
-		int lastIndex = 0;
-		for ( int i = 0; i < indicies.size(); i++ ) {
-			if ( ( lastIndex + 1 ) != indicies.get( i ) ) {
-				Log.warn( "Cluedo-common", "Indicies not consecutive for type '" + startsWith + "'. Expected " + ( lastIndex + 1 ) + " but got " + indicies.get( i ) );
+		if ( verifyIDs ) {
+			int lastIndex = 0;
+			for ( int i = 0; i < indicies.size(); i++ ) {
+				if ( ( lastIndex + 1 ) != indicies.get( i ) ) {
+					Log.warn( "Cluedo-common", "Indicies not consecutive for type '" + startsWith + "'. Expected " + ( lastIndex + 1 ) + " but got " + indicies.get( i ) );
+				}
+				lastIndex++;
 			}
-			lastIndex++;
 		}
 
 		return lines;
@@ -320,7 +329,7 @@ public class DefinitionParser {
 	 * @throws DefinitionException
 	 *             If for any reason an error occurred that prevented the construction of a meaningful Board.
 	 */
-	public static Board parseBoard( final String[][] readBoard, final Set< String > characterIDs, final Set< String > roomIDs, final Collection< String[] > secretPassages ) throws DefinitionException {
+	public static Board parseBoard( final String[][] readBoard, final Set< String > characterIDs, final Set< String > roomIDs, final List< String[] > secretPassages ) throws DefinitionException {
 		// Board dimensions
 		int rows = readBoard.length;
 		int cols = readBoard[0].length;
