@@ -288,7 +288,7 @@ public class DefinitionParser {
 		}
 
 		// Determine size 
-		if ( !( ( lines.size() > 0 ) && ( lines.get( 0 ).length > 1 ) ) ) {
+		if ( !( ( lines.size() > 0 ) && ( lines.get( 0 ).length > 0 ) ) ) {
 			throw new DefinitionException( "Error reading board. Board is empty." );
 		}
 		int rows = lines.size();
@@ -330,6 +330,59 @@ public class DefinitionParser {
 	 *             If for any reason an error occurred that prevented the construction of a meaningful Board.
 	 */
 	public static Board parseBoard( final String[][] readBoard, final Set< String > characterIDs, final Set< String > roomIDs, final List< String[] > secretPassages ) throws DefinitionException {
+		if ( readBoard[0][0].equalsIgnoreCase( "NoBoard" ) ) {
+			// Special case: No board
+			return new Board( Board.Type.NONE, new Tile[0][0], new HashMap< String, Position >() );
+		}
+
+		// Build Rooms
+		Map< String, Room > rooms = new HashMap<>();
+		for ( String roomID : roomIDs ) {
+			rooms.put( roomID, new Room() );
+		}
+
+		// Add Secret Passages to rooms
+		for ( String[] split : secretPassages ) {
+			Room room0 = rooms.get( split[0] );
+			Room room1 = rooms.get( split[1] );
+			room0.addSecretPassageTo( room1 );
+			room1.addSecretPassageTo( room0 );
+		}
+
+		if ( readBoard[0][0].equalsIgnoreCase( "Circle" ) ) {
+			// Special case: Circle board
+
+			// Build board
+			Tile[][] board = new Tile[1][1 + roomIDs.size()];
+			board[0][0] = new Hallway( true );
+			int roomCount = 0;
+			for ( Room room : rooms.values() ) {
+				board[0][1 + roomCount++] = room;
+			}
+
+			// Start positions are all in the hallway
+			Map< String, Position > startPositions = new HashMap<>();
+			for ( String characterID : characterIDs ) {
+				startPositions.put( characterID, new Position( 0, 0 ) );
+			}
+
+			// Link tiles
+			Tile hallway = board[0][0];
+			for ( int i = 0; i < roomIDs.size(); i++ ) {
+				Tile room = board[0][1 + i];
+
+				room.addAccessibleNeighbour( hallway );
+				hallway.addAccessibleNeighbour( room );
+
+				int pre = ( i == 0 ) ? roomIDs.size() - 1 : i - 1;
+				int post = ( i == ( roomIDs.size() - 1 ) ) ? 0 : i + 1;
+				room.addAccessibleNeighbour( board[0][1 + pre] );
+				room.addAccessibleNeighbour( board[0][1 + post] );
+			}
+
+			return new Board( Board.Type.CIRCLE, board, startPositions );
+		}
+
 		// Board dimensions
 		int rows = readBoard.length;
 		int cols = readBoard[0].length;
@@ -380,20 +433,6 @@ public class DefinitionParser {
 				message += " " + s;
 			}
 			throw new DefinitionException( message );
-		}
-
-		// Build Rooms
-		Map< String, Room > rooms = new HashMap<>();
-		for ( String roomID : roomIDs ) {
-			rooms.put( roomID, new Room() );
-		}
-
-		// Add Secret Passages to rooms
-		for ( String[] split : secretPassages ) {
-			Room room0 = rooms.get( split[0] );
-			Room room1 = rooms.get( split[1] );
-			room0.addSecretPassageTo( room1 );
-			room1.addSecretPassageTo( room0 );
 		}
 
 		// Build Board
@@ -494,7 +533,7 @@ public class DefinitionParser {
 			}
 		}
 
-		return new Board( board, startPositions );
+		return new Board( Board.Type.NORMAL, board, startPositions );
 	}
 
 	/**

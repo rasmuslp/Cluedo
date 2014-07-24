@@ -14,42 +14,50 @@ import cluedo.common.board.tiles.Tile;
  */
 public class Board {
 
-	private final Tile[][] board;
+	private final Type type;
+	private final Tile[][] tiles;
 	private final Map< String, Position > startPositions;
 
-	public Board( final Tile[][] board, final Map< String, Position > startPositions ) {
-		this.board = board;
+	public Board( final Type type, final Tile[][] tiles, final Map< String, Position > startPositions ) {
+		this.type = type;
+		this.tiles = tiles;
 		this.startPositions = startPositions;
 	}
 
-	public Tile[][] getBoard() {
-		return this.board;
+	public Type getType() {
+		return this.type;
+	}
+
+	public Tile[][] getTiles() {
+		return this.tiles;
 	}
 
 	public Map< String, Position > getStartPositions() {
 		return this.startPositions;
 	}
 
-	public static void printBoard( Tile[][] board ) {
-		int rows = board.length;
-		int cols = board[0].length;
+	public static void printBoard( Board board ) {
+		Tile[][] tiles = board.tiles;
+		int rows = tiles.length;
+		int cols = tiles[0].length;
 
 		for ( int row = 0; row < rows; row++ ) {
 			for ( int col = 0; col < cols; col++ ) {
-				board[row][col].print();
+				tiles[row][col].print();
 				System.out.print( " " );
 			}
 			System.out.println();
 		}
 	}
 
-	public static void printNoOfNeighbours( Tile[][] board ) {
-		int rows = board.length;
-		int cols = board[0].length;
+	public static void printNoOfNeighbours( Board board ) {
+		Tile[][] tiles = board.tiles;
+		int rows = tiles.length;
+		int cols = tiles[0].length;
 
 		for ( int row = 0; row < rows; row++ ) {
 			for ( int col = 0; col < cols; col++ ) {
-				Tile tile = board[row][col];
+				Tile tile = tiles[row][col];
 				if ( tile instanceof Hallway && ( (Hallway) tile ).isPreEntrance() ) {
 					System.out.print( tile.getNumberOfAccessibleNeighbours() );
 				} else if ( tile instanceof Room ) {
@@ -63,13 +71,14 @@ public class Board {
 		}
 	}
 
-	public static void printNoOfAssociatedRooms( Tile[][] board ) {
-		int rows = board.length;
-		int cols = board[0].length;
+	public static void printNoOfAssociatedRooms( Board board ) {
+		Tile[][] tiles = board.tiles;
+		int rows = tiles.length;
+		int cols = tiles[0].length;
 
 		for ( int row = 0; row < rows; row++ ) {
 			for ( int col = 0; col < cols; col++ ) {
-				Set< Tile > neighbours = board[row][col].getAccessibleNeighbours();
+				Set< Tile > neighbours = tiles[row][col].getAccessibleNeighbours();
 				int roomCount = 0;
 				for ( Tile tile : neighbours ) {
 					if ( tile instanceof Room ) {
@@ -80,13 +89,17 @@ public class Board {
 				if ( roomCount != 0 ) {
 					System.out.print( roomCount );
 				} else {
-					board[row][col].print();
+					tiles[row][col].print();
 				}
 
 				System.out.print( " " );
 			}
 			System.out.println();
 		}
+	}
+
+	public enum Type {
+		NORMAL, NONE, CIRCLE
 	}
 
 }
