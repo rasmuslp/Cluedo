@@ -38,11 +38,13 @@ public class CluedoClient {
 
 	private GlhfClient glhfClient = new GlhfClient();
 
-	private CluedoPlayer cluedoPlayer = new CluedoPlayer();
+	private CluedoPlayer cluedoPlayer;
 
 	private Definition definition;
 
-	public CluedoClient( final int port, final String host, final String name ) throws UnknownHostException, IOException {
+	public CluedoClient( final int port, final String host, final CluedoPlayer cluedoPlayer ) throws UnknownHostException, IOException {
+		this.cluedoPlayer = cluedoPlayer;
+
 		this.glhfClient.getMessageParser().setTieredMessageParser( new CluedoMessageParser() );
 
 		this.glhfClient.addPlayerListener( new PlayerListener() {
@@ -77,7 +79,7 @@ public class CluedoClient {
 			@Override
 			public void connected( Connection connection ) {
 				// Client connected to server.
-				CluedoClient.this.glhfClient.setName( name );
+				CluedoClient.this.glhfClient.setName( CluedoClient.this.cluedoPlayer.getName() );
 			}
 
 			@Override

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import crossnet.log.Log;
-import crossnet.log.LogLevel;
 
 /**
  * The entry point for the Cluedo-client.
@@ -16,12 +15,17 @@ import crossnet.log.LogLevel;
  */
 public class StartUp {
 
-	public static void main( String[] args ) throws UnknownHostException, IOException {
-		Log.set( LogLevel.DEBUG );
+	private int port = 0;
+	private String host;
+	protected String name;
 
-		int port = 0;
-		String host = null;
-		String name = null;
+	public void start( String[] args ) throws UnknownHostException, IOException {
+		this.parseArguments( args );
+		this.defaultArguments();
+		this.gogogo();
+	}
+
+	private void parseArguments( String[] args ) {
 		if ( args.length > 0 ) {
 			Log.info( "Cluedo-client", "Parsing command line arguments" );
 			boolean argParseError = false;
@@ -36,18 +40,18 @@ public class StartUp {
 					int no = Integer.parseInt( arg );
 					if ( no > 1000 ) {
 						// Port
-						port = no;
+						this.port = no;
 					}
 					continue;
 				} catch ( NumberFormatException e ) {
 					// This was not a number.
 				}
 
-				if ( host == null ) {
-					host = arg;
+				if ( this.host == null ) {
+					this.host = arg;
 				}
 
-				name = arg;
+				this.name = arg;
 			}
 
 			if ( argParseError ) {
@@ -59,29 +63,39 @@ public class StartUp {
 				System.exit( -1 );
 			}
 		}
+	}
 
-		if ( port == 0 ) {
-			port = 55100;
-			Log.info( "Cluedo-client", "Port not specified. Using default: " + port );
+	private void defaultArguments() {
+		if ( this.port == 0 ) {
+			this.port = 55100;
+			Log.info( "Cluedo-client", "Port not specified. Using default: " + this.port );
 		} else {
-			Log.info( "Cluedo-client", "Port: " + port );
+			Log.info( "Cluedo-client", "Port: " + this.port );
 		}
 
-		if ( host == null ) {
-			host = "localhost";
-			Log.info( "Cluedo-client", "Host not specified. Using default: " + host );
+		if ( this.host == null ) {
+			this.host = "localhost";
+			Log.info( "Cluedo-client", "Host not specified. Using default: " + this.host );
 		} else {
-			Log.info( "Cluedo-client", "Host: " + host );
+			Log.info( "Cluedo-client", "Host: " + this.host );
 		}
 
-		if ( name == null ) {
-			name = "EagerPlayer";
-			Log.info( "Cluedo-client", "Name not specified. Using default: " + name );
+		if ( this.name == null ) {
+			this.name = "EagerPlayer";
+			Log.info( "Cluedo-client", "Name not specified. Using default: " + this.name );
 		} else {
-			Log.info( "Cluedo-client", "Name: " + name );
+			Log.info( "Cluedo-client", "Name: " + this.name );
 		}
+	}
 
-		CluedoClient cluedoClient = new CluedoClient( port, host, name );
+	protected CluedoPlayer getCluedoPlayer() {
+		// Override this to supply an implementation of CluedoPlayer
+		return null;
+	}
+
+	public void gogogo() throws UnknownHostException, IOException {
+		CluedoClient cluedoClient = new CluedoClient( this.port, this.host, this.getCluedoPlayer() );
 		cluedoClient.loop();
 	}
+
 }

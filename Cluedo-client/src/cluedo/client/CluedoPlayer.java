@@ -5,11 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import cluedo.common.cards.Card;
 import cluedo.common.cards.ThreeCardPack;
-import cluedo.common.definition.Definition;
 
 /**
  * A player of the game.
@@ -17,31 +15,21 @@ import cluedo.common.definition.Definition;
  * @author Rasmus Ljungmann Pedersen <rasmuslp@gmail.com>
  * 
  */
-public class CluedoPlayer {
-
-	private final List< Card > cardsSeen = new ArrayList<>();
-
-	/**
-	 * The last suggestion made.
-	 */
-	private ThreeCardPack lastSuggestion;
+public abstract class CluedoPlayer {
 
 	/**
 	 * Name of this player.
 	 */
-	protected String name = "";
-
-	/**
-	 * Denotes whether this player is an active part of the game.
-	 * 
-	 * {@code False} iff this player has lost the game by making a false accusation.
-	 */
-	private boolean active = true;
+	protected final String name;
 
 	/**
 	 * The cards on this players hand.
 	 */
 	protected Map< String, Card > cardsOnHand = new HashMap<>();
+
+	protected CluedoPlayer( final String name ) {
+		this.name = name;
+	}
 
 	/**
 	 * Gets the name of this player.
@@ -50,22 +38,6 @@ public class CluedoPlayer {
 	 */
 	public String getName() {
 		return this.name;
-	}
-
-	/**
-	 * Sets this player as not active.
-	 */
-	public void setPassive() {
-		this.active = false;
-	}
-
-	/**
-	 * Checks whether this player is active.
-	 * 
-	 * @return {@code True} iff this player is active. {@code False} otherwise.
-	 */
-	public boolean isActive() {
-		return this.active;
 	}
 
 	/**
@@ -100,32 +72,7 @@ public class CluedoPlayer {
 	 * 
 	 * @return The suggestion.
 	 */
-	public ThreeCardPack makeSuggestion() {
-		System.out.println( this.getName() + " you may make a suggestion." );
-
-		// Filter known cards.
-		List< Card > possibleCharacterCards = this.filterCardsSeenAndOnHand( Definition.definition.getCharacterCards() );
-		List< Card > possibleRoomCards = this.filterCardsSeenAndOnHand( Definition.definition.getRoomCards() );
-		List< Card > possibleWeaponCards = this.filterCardsSeenAndOnHand( Definition.definition.getWeaponCards() );
-
-		this.printCardsOnHand();
-		this.printCardsSeen();
-
-		System.out.println( this.getName() + " this is the unknown cards:" );
-		CluedoPlayer.printCards( possibleCharacterCards, possibleRoomCards, possibleWeaponCards );
-
-		// Choose cards.
-		Random rng = new Random();
-		Card character = possibleCharacterCards.get( rng.nextInt( possibleCharacterCards.size() ) );
-		Card room = possibleRoomCards.get( rng.nextInt( possibleRoomCards.size() ) );
-		Card weapon = possibleWeaponCards.get( rng.nextInt( possibleWeaponCards.size() ) );
-
-		System.out.println( "Choosen cards: " + character.getID() + " " + room.getID() + " " + weapon.getID() );
-
-		this.lastSuggestion = new ThreeCardPack( character, room, weapon );
-
-		return this.lastSuggestion;
-	}
+	public abstract ThreeCardPack makeSuggestion();
 
 	/**
 	 * This player must try to disprove the suggestion.
@@ -184,13 +131,7 @@ public class CluedoPlayer {
 	}
 
 	//TODO: Give the three cards asked for ?
-	public Card disproveSuggestionChoose( final List< Card > gotCards ) {
-		Random rng = new Random();
-		Card card = gotCards.get( rng.nextInt( gotCards.size() ) );
-		System.out.println( this.getName() + " choose to show " + card.getID() );
-
-		return card;
-	}
+	public abstract Card disproveSuggestionChoose( final List< Card > gotCards );
 
 	//TODO: The player must know who shows the card.
 	/**
@@ -199,37 +140,14 @@ public class CluedoPlayer {
 	 * @param card
 	 *            The card to show this player.
 	 */
-	public void showCard( final Card card ) {
-		System.out.println( this.getName() + ": A player had the card " + card.getID() );
-		if ( !this.cardsSeen.contains( card ) ) {
-			this.cardsSeen.add( card );
-		}
-	}
+	public abstract void showCard( final Card card );
 
 	/**
 	 * This player may make an accusation.
 	 * 
 	 * @return The accusation. {@code null} if no accusation is made.
 	 */
-	public ThreeCardPack makeAccusation() {
-		System.out.println( this.getName() + " you may make an accusation." );
-
-		// Filter known cards.
-		List< Card > possibleCharacterCards = this.filterCardsSeenAndOnHand( Definition.definition.getCharacterCards() );
-		List< Card > possibleRoomCards = this.filterCardsSeenAndOnHand( Definition.definition.getRoomCards() );
-		List< Card > possibleWeaponCards = this.filterCardsSeenAndOnHand( Definition.definition.getWeaponCards() );
-
-		System.out.println( this.getName() + " after subtracting seen cards, this is the unknown cards:" );
-		CluedoPlayer.printCards( possibleCharacterCards, possibleRoomCards, possibleWeaponCards );
-
-		if ( ( possibleCharacterCards.size() > 1 ) || ( possibleRoomCards.size() > 1 ) || ( possibleWeaponCards.size() > 1 ) ) {
-			// Still unknowns
-			System.out.println( this.getName() + " 'I'm not even sure, but this must be right'" );
-		}
-
-		// Since this AI doesn't bluff, the last suggestion must be the solution.
-		return this.lastSuggestion;
-	}
+	public abstract ThreeCardPack makeAccusation();
 
 	/**
 	 * Prints the cards from the three lists.
@@ -260,23 +178,6 @@ public class CluedoPlayer {
 		}
 
 		System.out.println( out );
-	}
-
-	private void printCardsSeen() {
-		List< Card > hand = new ArrayList<>( this.cardsSeen );
-		Collections.sort( hand );
-		String out = this.getName() + " Seen cards:";
-		for ( Card card : hand ) {
-			out += " " + card.getID();
-		}
-		System.out.println( out );
-	}
-
-	private List< Card > filterCardsSeenAndOnHand( List< Card > cards ) {
-		List< Card > filteredCards = cards;
-		filteredCards.removeAll( this.cardsSeen );
-		filteredCards.removeAll( this.cardsOnHand.values() );
-		return filteredCards;
 	}
 
 }
