@@ -15,7 +15,6 @@ import java.util.List;
 
 import cluedo.common.cards.Card;
 import cluedo.common.cards.ThreeCardPack;
-import cluedo.common.definition.Definition;
 import cluedo.common.definition.DefinitionException;
 import cluedo.common.definition.DefinitionParser;
 import cluedo.common.message.CluedoMessage;
@@ -26,8 +25,9 @@ import cluedo.common.message.client.TurnEndMessage;
 import cluedo.common.message.common.DisproveMessage;
 import cluedo.common.message.server.DefinitionMessage;
 import cluedo.common.message.server.DisproveRequestMessage;
+import cluedo.common.message.server.GameEndMessage;
+import cluedo.common.message.server.GameStartMessage;
 import cluedo.common.message.server.HandCardMessage;
-import cluedo.common.message.server.StartingMessage;
 import cluedo.common.message.server.TurnStartMessage;
 import crossnet.Connection;
 import crossnet.listener.ConnectionListenerAdapter;
@@ -40,7 +40,7 @@ public class CluedoClient {
 
 	private CluedoPlayer cluedoPlayer;
 
-	private Definition definition;
+	private boolean gameInProgress = true;
 
 	public CluedoClient( final int port, final String host, final CluedoPlayer cluedoPlayer ) throws UnknownHostException, IOException {
 		this.cluedoPlayer = cluedoPlayer;
@@ -85,6 +85,8 @@ public class CluedoClient {
 			@Override
 			public void disconnected( Connection connection ) {
 				// Client has been disconnected from the server.
+				CluedoClient.this.glhfClient.stop();
+				CluedoClient.this.gameInProgress = false;
 			}
 
 			@Override
@@ -105,7 +107,7 @@ public class CluedoClient {
 							for ( StringEntity line : definitionMessage.getEntity() ) {
 								definitionText.add( line.get() );
 							}
-							CluedoClient.this.definition = DefinitionParser.parseDefinitionFromText( "Server provided definition", definitionText );
+							DefinitionParser.parseDefinitionFromText( "Server provided definition", definitionText );
 						} catch ( DefinitionException e ) {
 							Log.error( "Cluedo-client", "Could not parse definition from server.", e );
 							//TODO DIE by Exception.
@@ -117,14 +119,28 @@ public class CluedoClient {
 						break;
 					}
 
-					case S_STARTING: {
-						StartingMessage startingMessage = (StartingMessage) message;
+					case S_GAME_START: {
+						GameStartMessage gameStartMessage = (GameStartMessage) message;
 						Log.info( "Cluedo-client", "Game starting. Player order:" );
-						for ( IntegerEntity integerEntity : startingMessage.getEntity() ) {
+						for ( IntegerEntity integerEntity : gameStartMessage.getEntity() ) {
 							int id = integerEntity.get();
 							Player player = CluedoClient.this.glhfClient.getPlayers().get( id );
 							Log.info( "Cluedo-client", player.getName() + " (ID: " + id + ")" );
 						}
+						break;
+					}
+
+					case S_GAME_END: {
+						GameEndMessage gameEndMessage = (GameEndMessage) message;
+						if ( gameEndMessage.getID() == 0 ) {
+							Log.info( "Cluedo-client", "Sadly there were no winner..." );
+						} else if ( gameEndMessage.getID() == connection.getID() ) {
+							Log.info( "Cluedo-client", "Congratulations! You won the game!" );
+						} else {
+							Player player = CluedoClient.this.glhfClient.getPlayers().get( gameEndMessage.getID() );
+							Log.info( "Cluedo-client", player.getName() + " (ID: " + gameEndMessage.getID() + ") won the game!" );
+						}
+						Log.info( "Cluedo-client", gameEndMessage.getCaseFile().toString() );
 						break;
 					}
 
@@ -138,9 +154,13 @@ public class CluedoClient {
 					case S_TURN_START: {
 						TurnStartMessage turnStartMessage = (TurnStartMessage) message;
 						if ( turnStartMessage.getID() == connection.getID() ) {
+							Log.info( "Cluedo-client", "It is your turn." );
 							// Make suggestion
 							ThreeCardPack threeCardPack = CluedoClient.this.cluedoPlayer.makeSuggestion();
 							CluedoClient.this.glhfClient.send( new SuggestionMessage( threeCardPack ) );
+						} else {
+							Player player = CluedoClient.this.glhfClient.getPlayers().get( turnStartMessage.getID() );
+							Log.info( "Cluedo-client", "It is " + player.getName() + "'s turn (ID: " + player.getID() + ")" );
 						}
 						break;
 					}
@@ -197,7 +217,7 @@ public class CluedoClient {
 	}
 
 	public void loop() {
-		while ( true ) {
+		while ( this.gameInProgress ) {
 			// Stay a while, and listen.
 
 			try {
@@ -207,5 +227,6 @@ public class CluedoClient {
 				e.printStackTrace();
 			}
 		}
+		Log.info( "Cluedo-client", "Exiting..." );
 	}
 }

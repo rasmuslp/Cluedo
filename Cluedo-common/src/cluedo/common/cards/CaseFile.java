@@ -35,9 +35,7 @@ public class CaseFile extends ThreeCardPack {
 	public String toString() {
 		String out = "";
 		if ( this.solved ) {
-			out += "It was " + this.getCharacterCard().getTitle() + " (" + this.getCharacterCard().getID() + ")";
-			out += " with the " + this.getWeaponCard().getTitle() + " (" + this.getWeaponCard().getID() + ")";
-			out += " in the " + this.getRoomCard().getTitle() + " (" + this.getRoomCard().getID() + ").";
+			out += super.toString();
 		}
 
 		return out;

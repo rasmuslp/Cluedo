@@ -6,7 +6,9 @@ public enum CluedoMessageType {
 
 	S_DEFINITION,
 
-	S_STARTING,
+	S_GAME_START,
+
+	S_GAME_END,
 
 	S_HAND_CARD,
 

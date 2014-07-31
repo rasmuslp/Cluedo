@@ -66,6 +66,14 @@ public class ThreeCardPack implements Entity {
 	}
 
 	@Override
+	public String toString() {
+		String out = "It was " + this.getCharacterCard().getTitle() + " (" + this.getCharacterCard().getID() + ")";
+		out += " with the " + this.getWeaponCard().getTitle() + " (" + this.getWeaponCard().getID() + ")";
+		out += " in the " + this.getRoomCard().getTitle() + " (" + this.getRoomCard().getID() + ").";
+		return out;
+	}
+
+	@Override
 	public void serialise( ByteArrayWriter to ) throws IOException {
 		to.writeString255( this.characterCard.getID() );
 		to.writeString255( this.roomCard.getID() );

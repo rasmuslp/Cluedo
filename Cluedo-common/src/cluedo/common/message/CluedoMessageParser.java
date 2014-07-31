@@ -15,8 +15,9 @@ import cluedo.common.message.client.TurnEndMessage;
 import cluedo.common.message.common.DisproveMessage;
 import cluedo.common.message.server.DefinitionMessage;
 import cluedo.common.message.server.DisproveRequestMessage;
+import cluedo.common.message.server.GameEndMessage;
+import cluedo.common.message.server.GameStartMessage;
 import cluedo.common.message.server.HandCardMessage;
-import cluedo.common.message.server.StartingMessage;
 import cluedo.common.message.server.TurnStartMessage;
 import crossnet.log.Log;
 import crossnet.message.AbstractMessageParser;
@@ -49,14 +50,21 @@ public class CluedoMessageParser extends AbstractMessageParser< CluedoMessageTyp
 					break;
 				}
 
-				case S_STARTING: {
+				case S_GAME_START: {
 					IntegerList ids = new IntegerList();
 					int count = payload.readInt();
 					for ( int i = 0; i < count; i++ ) {
 						int id = payload.readInt();
 						ids.add( id );
 					}
-					message = new StartingMessage( ids );
+					message = new GameStartMessage( ids );
+					break;
+				}
+
+				case S_GAME_END: {
+					int id = payload.readInt();
+					ThreeCardPack threeCardPack = ThreeCardPack.parse( payload );
+					message = new GameEndMessage( id, threeCardPack );
 					break;
 				}
 

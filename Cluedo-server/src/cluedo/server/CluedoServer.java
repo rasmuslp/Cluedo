@@ -28,8 +28,9 @@ import cluedo.common.message.client.TurnEndMessage;
 import cluedo.common.message.common.DisproveMessage;
 import cluedo.common.message.server.DefinitionMessage;
 import cluedo.common.message.server.DisproveRequestMessage;
+import cluedo.common.message.server.GameEndMessage;
+import cluedo.common.message.server.GameStartMessage;
 import cluedo.common.message.server.HandCardMessage;
-import cluedo.common.message.server.StartingMessage;
 import cluedo.common.message.server.TurnStartMessage;
 import cluedo.server.definition.DefinitionManager;
 import crossnet.Connection;
@@ -118,7 +119,8 @@ public class CluedoServer {
 
 				// Server Messages
 					case S_DEFINITION:
-					case S_STARTING:
+					case S_GAME_START:
+					case S_GAME_END:
 					case S_HAND_CARD:
 					case S_TURN_START:
 					case S_DISPROVE_REQ:
@@ -173,7 +175,7 @@ public class CluedoServer {
 					for ( Integer id : this.cluedoPlayers.keySet() ) {
 						list.add( id );
 					}
-					this.glhfServer.sendToAll( new StartingMessage( list ) );
+					this.glhfServer.sendToAll( new GameStartMessage( list ) );
 					this.prepareGame();
 					this.gameRunning = true;
 				}
@@ -323,13 +325,17 @@ public class CluedoServer {
 
 		// Announce end of game.
 		if ( winningPlayer != null ) {
-			Log.info( "Cluedo-server", "The murder was solved by " + winningPlayer.getName() + " ! (ID: " + currentPlayerID + ")" );
+			this.glhfServer.sendToAll( new GameEndMessage( winningPlayer.getID(), this.caseFile ) );
+			Log.info( "Cluedo-server", "The murder was solved by " + winningPlayer.getName() + " ! (ID: " + winningPlayer.getID() + ")" );
 		} else {
+			this.glhfServer.sendToAll( new GameEndMessage( 0, this.caseFile ) );
 			Log.info( "Cluedo-server", "No one was able to solve the murder." );
 		}
 		Log.info( "Cluedo-server", this.caseFile.toString() );
 
-		System.exit( -1 );
+		Log.info( "Cluedo-server", "Exiting..." );
+
+		System.exit( 0 );
 	}
 
 	private boolean allReady() {

@@ -87,7 +87,7 @@ public abstract class CluedoPlayer {
 		Card roomCard = suggestion.getRoomCard();
 		Card weaponCard = suggestion.getWeaponCard();
 
-		Log.info( "Cluedo-player", "You are asked if you got any of the following cards: " + characterCard.getID() + " " + roomCard.getID() + " " + weaponCard.getID() );
+		Log.info( "Cluedo-player", "You are asked if you have got any of the following cards: " + characterCard.getID() + " " + roomCard.getID() + " " + weaponCard.getID() );
 
 		boolean gotCharacterCard = this.cardsOnHand.containsKey( characterCard.getID() );
 		boolean gotRoomCard = this.cardsOnHand.containsKey( roomCard.getID() );
