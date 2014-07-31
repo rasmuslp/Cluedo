@@ -8,6 +8,7 @@ import java.util.Map;
 
 import cluedo.common.cards.Card;
 import cluedo.common.cards.ThreeCardPack;
+import crossnet.log.Log;
 
 /**
  * A player of the game.
@@ -60,11 +61,11 @@ public abstract class CluedoPlayer {
 	public void printCardsOnHand() {
 		List< Card > hand = new ArrayList<>( this.cardsOnHand.values() );
 		Collections.sort( hand );
-		String out = this.getName() + " Hand:";
+		String out = " - Cards on hand:";
 		for ( Card card : hand ) {
 			out += " " + card.getID();
 		}
-		System.out.println( out );
+		Log.info( "Cluedo-player", out );
 	}
 
 	/**
@@ -86,7 +87,7 @@ public abstract class CluedoPlayer {
 		Card roomCard = suggestion.getRoomCard();
 		Card weaponCard = suggestion.getWeaponCard();
 
-		System.out.println( this.getName() + ": You are asked if you got any of the following cards: " + characterCard.getID() + " " + roomCard.getID() + " " + weaponCard.getID() );
+		Log.info( "Cluedo-player", "You are asked if you got any of the following cards: " + characterCard.getID() + " " + roomCard.getID() + " " + weaponCard.getID() );
 
 		boolean gotCharacterCard = this.cardsOnHand.containsKey( characterCard.getID() );
 		boolean gotRoomCard = this.cardsOnHand.containsKey( roomCard.getID() );
@@ -95,24 +96,24 @@ public abstract class CluedoPlayer {
 		List< Card > gotCards = new ArrayList<>();
 		int gotNoCards = 0;
 		if ( gotCharacterCard ) {
-			System.out.println( this.getName() + ": You have the Character card " + characterCard.getID() );
+			Log.info( "Cluedo-player", " - You have the Character card " + characterCard.getID() );
 			gotCards.add( characterCard );
 			gotNoCards++;
 		}
 		if ( gotRoomCard ) {
-			System.out.println( this.getName() + ": You have the Room card " + roomCard.getID() );
+			Log.info( "Cluedo-player", " - You have the Room card " + roomCard.getID() );
 			gotCards.add( roomCard );
 			gotNoCards++;
 		}
 		if ( gotWeaponCard ) {
-			System.out.println( this.getName() + ": You have the Weapon card " + weaponCard.getID() );
+			Log.info( "Cluedo-player", " - You have the Weapon card " + weaponCard.getID() );
 			gotCards.add( weaponCard );
 			gotNoCards++;
 		}
 
 		Card choosenCard = null;
 		if ( gotNoCards == 0 ) {
-			System.out.println( this.getName() + ": You have none of these." );
+			Log.info( "Cluedo-player", " * You have none of these." );
 		} else if ( gotNoCards == 1 ) {
 			if ( gotCharacterCard ) {
 				choosenCard = characterCard;
@@ -121,10 +122,18 @@ public abstract class CluedoPlayer {
 			} else if ( gotWeaponCard ) {
 				choosenCard = weaponCard;
 			}
-			System.out.println( this.getName() + ": You have this: " + choosenCard.getID() );
+			Log.info( "Cluedo-player", " * You show the card: " + choosenCard.getID() );
 		} else {
 			// 1+ cards
+			String out = " - You have more than one card. You must choose which card to show:";
+			for ( Card card : gotCards ) {
+				out += " " + card.getID();
+			}
+			Log.info( "Cluedo-player", out );
+
 			choosenCard = this.disproveSuggestionChoose( gotCards );
+
+			Log.info( "Cluedo-player", " * You choose to show " + choosenCard.getID() );
 		}
 
 		return choosenCard;
@@ -160,24 +169,23 @@ public abstract class CluedoPlayer {
 	 *            The weapon cards to print.
 	 */
 	protected static void printCards( final List< Card > characterCards, final List< Card > roomCards, final List< Card > weaponCards ) {
-		String out = "Characters:";
+		String out = " - Characters:";
 		for ( Card card : characterCards ) {
 			out += " " + card.getID();
 		}
-		out += "\n";
+		Log.info( "Cluedo-player", out );
 
-		out += "Rooms:";
+		out = " - Rooms:";
 		for ( Card card : roomCards ) {
 			out += " " + card.getID();
 		}
-		out += "\n";
+		Log.info( "Cluedo-player", out );
 
-		out += "Weapons:";
+		out = " - Weapons:";
 		for ( Card card : weaponCards ) {
 			out += " " + card.getID();
 		}
-
-		System.out.println( out );
+		Log.info( "Cluedo-player", out );
 	}
 
 }

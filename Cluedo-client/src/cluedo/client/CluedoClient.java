@@ -123,7 +123,7 @@ public class CluedoClient {
 						for ( IntegerEntity integerEntity : startingMessage.getEntity() ) {
 							int id = integerEntity.get();
 							Player player = CluedoClient.this.glhfClient.getPlayers().get( id );
-							Log.info( "Cluedo-client", player.getName() + " with ID: " + id );
+							Log.info( "Cluedo-client", player.getName() + " (ID: " + id + ")" );
 						}
 						break;
 					}

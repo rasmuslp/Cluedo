@@ -9,6 +9,7 @@ import cluedo.client.CluedoPlayer;
 import cluedo.common.cards.Card;
 import cluedo.common.cards.ThreeCardPack;
 import cluedo.common.definition.Definition;
+import crossnet.log.Log;
 
 public class HumanCluedoPlayer extends CluedoPlayer {
 
@@ -18,7 +19,7 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 
 	@Override
 	public ThreeCardPack makeSuggestion() {
-		System.out.println( this.getName() + " you may make a suggestion." );
+		Log.info( "Cluedo-player", "You may make a suggestion." );
 
 		this.printCardsOnHand();
 
@@ -28,12 +29,6 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 	@Override
 	public Card disproveSuggestionChoose( final List< Card > gotCards ) {
 		Card choosenCard = null;
-
-		String out = this.getName() + ": You have more than one card. You must choose which card to show:";
-		for ( Card card : gotCards ) {
-			out += " " + card.getID();
-		}
-		System.out.println( out );
 
 		// Choose card
 		BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
@@ -51,10 +46,10 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 					}
 				}
 				if ( !valid ) {
-					System.out.println( "Couldn't read ID. Try again." );
+					Log.info( "Cluedo-player", " - Couldn't read ID. Try again." );
 				}
 			} catch ( IOException e ) {
-				System.out.println( "Couldn't read ID. Try again." );
+				Log.info( "Cluedo-player", " - Couldn't read ID. Try again." );
 				e.printStackTrace();
 			}
 		}
@@ -64,16 +59,16 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 
 	@Override
 	public void showCard( final Card card ) {
-		System.out.println( this.getName() + ": A player had the card " + card.getID() );
+		Log.info( "Cluedo-player", " * A player had the card " + card.getID() );
 	}
 
 	@Override
 	public ThreeCardPack makeAccusation() {
-		System.out.println( this.getName() + " you may make am accusation." );
+		Log.info( "Cluedo-player", "You may make an accusation." );
 
 		this.printCardsOnHand();
 
-		System.out.println( "Would you like to make an accusation ? (y/n) [n]" );
+		Log.info( "Cluedo-player", " - Would you like to make an accusation ? (y/n) [n]" );
 		BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
 		boolean makeAccusation = false;
 		while ( true ) {
@@ -91,9 +86,9 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 					makeAccusation = false;
 					break;
 				}
-				System.out.println( "Must be 'y' or 'n'." );
+				Log.info( "Cluedo-player", " - Must be 'y' or 'n'." );
 			} catch ( IOException e ) {
-				System.out.println( "Must be 'y' or 'n'." );
+				Log.info( "Cluedo-player", " - Must be 'y' or 'n'." );
 			}
 		}
 
@@ -110,7 +105,7 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 	 * @return The three choosen cards.
 	 */
 	private ThreeCardPack chooseCards() {
-		System.out.println( "Write 3 space separated IDs:" );
+		Log.info( "Cluedo-player", " - Write 3 space separated IDs:" );
 		BufferedReader in = new BufferedReader( new InputStreamReader( System.in ) );
 
 		Card character = null;
@@ -125,7 +120,7 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 				// See if there were three space separated entries.
 				String[] split = input.split( "\\s+" );
 				if ( split.length != 3 ) {
-					System.out.println( "Couldn't read 3 IDs. Try again." );
+					Log.info( "Cluedo-player", " - Couldn't read 3 IDs. Try again." );
 					continue;
 				}
 				for ( int i = 0; i < 3; i++ ) {
@@ -174,17 +169,17 @@ public class HumanCluedoPlayer extends CluedoPlayer {
 
 				// Validates matches.
 				if ( character == null || room == null || weapon == null ) {
-					System.out.println( "Couldn't read 3 IDs. Try again." );
+					Log.info( "Cluedo-player", "Couldn't read 3 IDs. Try again." );
 				} else {
 					break;
 				}
 			} catch ( IOException e ) {
-				System.out.println( "Couldn't read 3 IDs. Try again." );
+				Log.info( "Cluedo-player", "Couldn't read 3 IDs. Try again." );
 				e.printStackTrace();
 			}
 		}
 
-		System.out.println( "Choosen cards: " + character.getID() + " " + room.getID() + " " + weapon.getID() );
+		Log.info( "Cluedo-player", " * Choosen cards: " + character.getID() + " " + room.getID() + " " + weapon.getID() );
 
 		return new ThreeCardPack( character, room, weapon );
 	}

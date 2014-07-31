@@ -214,7 +214,7 @@ public class CluedoServer {
 					}
 
 					/// CluedoPlayer turn begins.
-					Log.info( "Cluedo-server", "It is " + currentPlayer.getName() + "'s turn (" + currentPlayer.getID() + ")" );
+					Log.info( "Cluedo-server", "It is " + currentPlayer.getName() + "'s turn (ID: " + currentPlayer.getID() + ")" );
 					this.glhfServer.sendToAll( new TurnStartMessage( currentPlayer.getID() ) );
 
 					turnState = TurnState.SUGGESTION;
@@ -253,7 +253,7 @@ public class CluedoServer {
 									disproverID = this.getNextToDisprove( disproverID, currentPlayerID );
 									if ( disproverID == null ) {
 										// No one could disprove
-										Log.info( "Cluedo-server", "No one could disprove " + currentPlayer.getName() + "'s suggestion. (" + currentPlayerID + ")" );
+										Log.info( "Cluedo-server", "No one could disprove " + currentPlayer.getName() + "'s suggestion. (ID: " + currentPlayerID + ")" );
 
 										// Notify current player
 										//TODO: Seriously hax !
@@ -277,17 +277,17 @@ public class CluedoServer {
 							if ( message instanceof TurnEndMessage ) {
 								currentPlayer = null;
 							} else if ( message instanceof AccusationMessage ) {
-								Log.info( "Cluedo-server", currentPlayer.getName() + " goes for it and makes an accusation. (" + currentPlayerID + ")" );
+								Log.info( "Cluedo-server", currentPlayer.getName() + " goes for it and makes an accusation. (ID: " + currentPlayerID + ")" );
 								ThreeCardPack accusation = ( (AccusationMessage) message ).getAccusation();
 
 								if ( this.caseFile.tryAccusation( accusation ) ) {
 									// Player solved the murder.
-									Log.info( "Cluedo-server", currentPlayer.getName() + " made the right call. (" + currentPlayerID + ")" );
+									Log.info( "Cluedo-server", currentPlayer.getName() + " made the right call. (ID: " + currentPlayerID + ")" );
 									winningPlayer = currentPlayer;
 									gameOver = true;
 								} else {
 									// Player looses.
-									Log.info( "Cluedo-server", currentPlayer.getName() + " made the wrong call and is now a passive player. (" + currentPlayerID + ")" );
+									Log.info( "Cluedo-server", currentPlayer.getName() + " made the wrong call and is now a passive player. (ID: " + currentPlayerID + ")" );
 									this.cluedoPlayers.get( currentPlayerID ).setPassive();
 
 									// Turn ends
@@ -323,11 +323,11 @@ public class CluedoServer {
 
 		// Announce end of game.
 		if ( winningPlayer != null ) {
-			Log.info( "Cluedo-server", "The murder was solved by " + winningPlayer.getName() + " ! (" + currentPlayerID + ")" );
+			Log.info( "Cluedo-server", "The murder was solved by " + winningPlayer.getName() + " ! (ID: " + currentPlayerID + ")" );
 		} else {
 			Log.info( "Cluedo-server", "No one was able to solve the murder." );
 		}
-		System.out.println( this.caseFile );
+		Log.info( "Cluedo-server", this.caseFile.toString() );
 
 		System.exit( -1 );
 	}
