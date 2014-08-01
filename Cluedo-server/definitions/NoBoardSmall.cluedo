@@ -1,0 +1,18 @@
+P:3-6
+C1:Miss Scarlet
+C2:Colonel Mustard
+C3:Mrs. White
+C4:Mr. Green
+R1:Kitchen
+R2:Ballroom
+R3:Conservatory
+R4:Dining Room
+R5:Billiard Room
+R6:Library
+W1:Candlestick
+W2:Knife
+W3:Lead Pipe
+W4:Revolver
+BOARD
+NOBOARD
+EOF
